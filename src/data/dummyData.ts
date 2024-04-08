@@ -28,7 +28,7 @@ export const dummyData: UserRequest[] = [
         requestId: 103,
         requestTitle: `Lorem ipsum dolor`,
         requestDate: getCurrentDate(),
-        requestStatus: 'cancelled'
+        requestStatus: 'rejected'
     },
     {
         requestId: 101,
@@ -46,7 +46,7 @@ export const dummyData: UserRequest[] = [
         requestId: 103,
         requestTitle: `Lorem ipsum dolor`,
         requestDate: getCurrentDate(),
-        requestStatus: 'cancelled'
+        requestStatus: 'rejected'
     },
     {
         requestId: 101,
@@ -64,7 +64,7 @@ export const dummyData: UserRequest[] = [
         requestId: 103,
         requestTitle: `Lorem ipsum dolor`,
         requestDate: getCurrentDate(),
-        requestStatus: 'cancelled'
+        requestStatus: 'rejected'
     },
     {
         requestId: 101,
@@ -82,7 +82,7 @@ export const dummyData: UserRequest[] = [
         requestId: 103,
         requestTitle: `Lorem ipsum dolor`,
         requestDate: getCurrentDate(),
-        requestStatus: 'cancelled'
+        requestStatus: 'rejected'
     },
     {
         requestId: 101,
@@ -100,7 +100,7 @@ export const dummyData: UserRequest[] = [
         requestId: 103,
         requestTitle: `Lorem ipsum dolor`,
         requestDate: getCurrentDate(),
-        requestStatus: 'cancelled'
+        requestStatus: 'rejected'
     },
     {
         requestId: 101,
@@ -118,7 +118,7 @@ export const dummyData: UserRequest[] = [
         requestId: 103,
         requestTitle: `Lorem ipsum dolor`,
         requestDate: getCurrentDate(),
-        requestStatus: 'cancelled'
+        requestStatus: 'rejected'
     }
 ]
 

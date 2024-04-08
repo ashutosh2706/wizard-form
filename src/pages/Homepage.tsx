@@ -4,7 +4,7 @@ import UserRequestTable from "../components/UserRequestTable";
 
 
 interface HomepageProps {
-    role: string,
+    role: string | undefined,
     username: string,
     setLoggedIn: React.Dispatch<React.SetStateAction<boolean>>;
 }

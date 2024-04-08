@@ -128,7 +128,7 @@ export default function AllUserTable() {
                                             }
                                         </tr>
                                     ))
-                                ) : (<div className="text-red-600 font-medium p-5 items-center justify-center text-lg">No record found !</div>)
+                                ) : (<tr><td className="text-red-600 font-medium p-5 items-center justify-center text-xl">No record found!</td></tr>)
                             }
                         </tbody>
                     </table>

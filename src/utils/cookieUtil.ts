@@ -1,8 +1,8 @@
-export const setCookie = (token: string) => {
+export const setCookie = (key: string, value: string) => {
     const date = new Date();
     date.setTime(date.getTime() + (7 * 24 * 60 * 60 * 1000));   // expire cookie after a week
     const expires = "expires=" + date.toUTCString();
-    document.cookie = `token=${token};${expires};path=/`;
+    document.cookie = `${key}=${value};${expires};path=/`;
 }
 
 export const getCookie = (key: string): string | undefined => {
@@ -14,4 +14,9 @@ export const getCookie = (key: string): string | undefined => {
         }
     }
     return undefined;
+}
+
+
+export const deleteCookie = (key: string) => {
+    document.cookie = key + "=; Max-Age=-1; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
 }

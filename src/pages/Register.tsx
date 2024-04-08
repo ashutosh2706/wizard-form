@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { register } from "../api/register";
 
 
 export default function Register() {
@@ -13,14 +14,12 @@ export default function Register() {
         const email = formData.get("email") as string;
         const password = formData.get("password") as string;
 
-        
-        /** TODO handle register */
-        console.error(`${firstname} ${lastname} ${email} ${password} ${adminRole}`);
-        
-        
-        
-        window.alert('Registered Successfully');
-        navigate("/");
+        const roleId: number = adminRole ? 2 : 1;
+        register(firstname, lastname, email, password, roleId).then((res) => {
+            console.log(res);
+            window.alert('Registered Successfully');
+            navigate("/");
+        }).catch(err => console.error(err));
     }
 
     return (

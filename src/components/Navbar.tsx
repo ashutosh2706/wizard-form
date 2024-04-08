@@ -1,5 +1,6 @@
 import { User, LogOut } from "lucide-react";
 import { useState } from "react";
+import { deleteCookie } from "../utils/cookieUtil";
 
 interface NavbarProps {
     username: string,
@@ -11,9 +12,8 @@ export default function Navbar({ username, setLoggedIn }: NavbarProps) {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
     function handleLogout() {
-        // TODO: delete cookie
-
-
+        deleteCookie('token');
+        deleteCookie('role');
         setLoggedIn(false);
     }
 

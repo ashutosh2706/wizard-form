@@ -1,28 +1,36 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Homepage from "./Homepage";
+import { login } from "../api/login";
+import { LoginResponse } from "../types/LoginResponse";
+import { getCookie, setCookie } from "../utils/cookieUtil";
 
 export default function Login() {
 
     const navigate = useNavigate();
     const [loggedIn, setLoggedIn] = useState<boolean>(false);
+    const [role, setRole] = useState<string>();
 
 
     useEffect(() => {
-        // check for cookies
-        // if cookies present, setLoggedIn(true);
+        const token: string | undefined = getCookie("token");
+        const role: string | undefined = getCookie("role");
+        if(role && token) {
+            setRole(role);
+            setLoggedIn(true);
+        }
+
     }, [])
 
 
     function loginUser(email: string, password: string) {
 
-        /** TODO handle login
-         * if logged in, save cookie
-         */
-
-        
-        console.error(`${email} ${password}`);
-        setLoggedIn(true);
+        login(email, password).then((data: LoginResponse) => {
+            setRole(data.role);
+            setCookie("token", data.token);
+            setCookie("role", data.role);
+            setLoggedIn(true);
+        }).catch(error => console.error(error));
         
     }
 
@@ -62,7 +70,6 @@ export default function Login() {
             </>
         )
     } else {
-        // check user role from server and pass accordingly as 'admin' | 'user'
-        return (<Homepage role="user" username="John Doe" setLoggedIn={setLoggedIn}/>)
+        return (<Homepage role={role} username="John Doe" setLoggedIn={setLoggedIn}/>)
     }
 }
