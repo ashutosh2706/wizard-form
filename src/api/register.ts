@@ -9,7 +9,7 @@ export const register = async (firstName: string, lastName: string, email: strin
     });
 
     if(!response.ok) {
-        throw new Error("Internal Server Error")
+        throw new Error("Server Error")
     }
 
     const responseData = await response.json();

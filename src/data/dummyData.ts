@@ -1,6 +1,5 @@
 import { UserModel } from "../types/userModel";
 import { UserRequest } from "../types/userRequest"
-import { UserRequestAdmin } from "../types/userRequestAdmin";
 
 function getCurrentDate(): string {
     const today = new Date();
@@ -128,191 +127,104 @@ export const dummyUsers: UserModel[] = [
         firstName: 'Michael',
         lastName: 'Townley',
         email: 'Michael@gmail.com',
-        status: "allowed"
+        isAllowed: "allowed"
     },
     {
         userId: 102,
         firstName: 'Franklin',
         lastName: 'Clinton',
         email: 'Franklin@gmail.com',
-        status: "restricted"
+        isAllowed: "restricted"
     },
     {
         userId: 103,
         firstName: 'Trevor',
         lastName: 'Philips',
         email: 'Trevor@gmail.com',
-        status: "allowed"
+        isAllowed: "allowed"
     },
     {
         userId: 101,
         firstName: 'Michael',
         lastName: 'Townley',
         email: 'Michael@gmail.com',
-        status: "allowed"
+        isAllowed: "allowed"
     },
     {
         userId: 102,
         firstName: 'Franklin',
         lastName: 'Clinton',
         email: 'Franklin@gmail.com',
-        status: "restricted"
+        isAllowed: "restricted"
     },
     {
         userId: 103,
         firstName: 'Trevor',
         lastName: 'Philips',
         email: 'Trevor@gmail.com',
-        status: "allowed"
+        isAllowed: "allowed"
     },
     {
         userId: 101,
         firstName: 'Michael',
         lastName: 'Townley',
         email: 'Michael@gmail.com',
-        status: "allowed"
+        isAllowed: "allowed"
     },
     {
         userId: 102,
         firstName: 'Franklin',
         lastName: 'Clinton',
         email: 'Franklin@gmail.com',
-        status: "restricted"
+        isAllowed: "restricted"
     },
     {
         userId: 103,
         firstName: 'Trevor',
         lastName: 'Philips',
         email: 'Trevor@gmail.com',
-        status: "allowed"
+        isAllowed: "allowed"
     },
     {
         userId: 101,
         firstName: 'Michael',
         lastName: 'Townley',
         email: 'Michael@gmail.com',
-        status: "allowed"
+        isAllowed: "allowed"
     },
     {
         userId: 102,
         firstName: 'Franklin',
         lastName: 'Clinton',
         email: 'Franklin@gmail.com',
-        status: "restricted"
+        isAllowed: "restricted"
     },
     {
         userId: 103,
         firstName: 'Trevor',
         lastName: 'Philips',
         email: 'Trevor@gmail.com',
-        status: "allowed"
+        isAllowed: "allowed"
     },
     {
         userId: 101,
         firstName: 'Michael',
         lastName: 'Townley',
         email: 'Michael@gmail.com',
-        status: "allowed"
+        isAllowed: "allowed"
     },
     {
         userId: 102,
         firstName: 'Franklin',
         lastName: 'Clinton',
         email: 'Franklin@gmail.com',
-        status: "restricted"
+        isAllowed: "restricted"
     },
     {
         userId: 103,
         firstName: 'Trevor',
         lastName: 'Philips',
         email: 'Trevor@gmail.com',
-        status: "allowed"
-    }
-]
-
-export const dummyRequest: UserRequestAdmin[] = [
-    {
-        requestId: 1,
-        userId: 101,
-        title: "some important request title",
-        priority: "medium",
-        status: "pending"
-    },
-    {
-        requestId: 2,
-        userId: 101,
-        title: "some important request title",
-        priority: "medium",
-        status: "pending"
-    },
-    {
-        requestId: 3,
-        userId: 101,
-        title: "some important request title",
-        priority: "medium",
-        status: "pending"
-    },
-    {
-        requestId: 4,
-        userId: 101,
-        title: "some important request title",
-        priority: "medium",
-        status: "pending"
-    },
-    {
-        requestId: 5,
-        userId: 101,
-        title: "some important request title",
-        priority: "medium",
-        status: "pending"
-    },
-    {
-        requestId: 6,
-        userId: 101,
-        title: "some important request title",
-        priority: "medium",
-        status: "pending"
-    },
-    {
-        requestId: 7,
-        userId: 101,
-        title: "some important request title",
-        priority: "medium",
-        status: "pending"
-    },
-    {
-        requestId: 8,
-        userId: 101,
-        title: "some important request title",
-        priority: "medium",
-        status: "pending"
-    },
-    {
-        requestId: 9,
-        userId: 101,
-        title: "some important request title",
-        priority: "medium",
-        status: "pending"
-    },
-    {
-        requestId: 10,
-        userId: 101,
-        title: "some important request title",
-        priority: "medium",
-        status: "pending"
-    },
-    {
-        requestId: 11,
-        userId: 101,
-        title: "some important request title",
-        priority: "medium",
-        status: "pending"
-    },
-    {
-        requestId: 12,
-        userId: 101,
-        title: "some important request title",
-        priority: "medium",
-        status: "pending"
+        isAllowed: "allowed"
     }
 ]

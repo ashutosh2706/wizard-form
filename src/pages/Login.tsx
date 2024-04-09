@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Homepage from "./Homepage";
 import { login } from "../api/login";
-import { LoginResponse } from "../types/LoginResponse";
 import { getCookie, setCookie } from "../utils/cookieUtil";
+import { decodeJwt } from "../utils/decodeJwt";
 
 export default function Login() {
 
@@ -25,10 +25,11 @@ export default function Login() {
 
     function loginUser(email: string, password: string) {
 
-        login(email, password).then((data: LoginResponse) => {
-            setRole(data.role);
-            setCookie("token", data.token);
-            setCookie("role", data.role);
+        login(email, password).then((data) => {
+            const role = decodeJwt(data).RoleType;
+            setCookie('token', data);
+            setCookie('role', role);
+            setRole(role);
             setLoggedIn(true);
         }).catch(error => console.error(error));
         
@@ -70,6 +71,6 @@ export default function Login() {
             </>
         )
     } else {
-        return (<Homepage role={role} username="John Doe" setLoggedIn={setLoggedIn}/>)
+        return (<Homepage role={role} setLoggedIn={setLoggedIn}/>)
     }
 }

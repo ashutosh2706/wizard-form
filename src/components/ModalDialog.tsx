@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { X, Check } from "lucide-react";
 import { UserRequestAdmin } from "../types/userRequestAdmin";
+import { getRequestByRequestId, updateRequestStatus } from "../api/request";
+import { UserRequestAPI } from "../types/userRequest";
 
 interface ModalProps {
     isModalVisible: boolean,
@@ -15,17 +17,20 @@ export default function ModalDialog({ isModalVisible, onClose, requestId }: Moda
 
     useEffect(() => {
 
-        console.log(requestId);
-        // => fetch request detail from api as DTO
-        const dummyRequestDetail: UserRequestAdmin = Object.assign({}, {
-            requestId: 1010,
-            userId: 1010,
-            title: 'Some cringe reason',
-            priority: 'high',
-            status: 'pending'
-        })
+        
+        if(typeof requestId === 'number') {
 
-        setRequestDetail(dummyRequestDetail);
+            getRequestByRequestId(requestId).then((data: UserRequestAPI) => {
+                const request: UserRequestAdmin = {
+                    requestId: data.requestId,
+                    userId: data.userId,
+                    title: data.title,
+                    priority: data.priorityCode === 1 ? 'High' : data.priorityCode === 2 ? 'Normal' : 'Low',
+                    status: data.statusCode === 1 ? 'Pending' : data.statusCode === 2 ? 'Approved' : 'Rejected'
+                }
+                setRequestDetail(request);
+            }).catch(err => console.error(err));
+        }
 
     }, [requestId]);
 
@@ -33,7 +38,8 @@ export default function ModalDialog({ isModalVisible, onClose, requestId }: Moda
 
     const handleStatusChange = (requestId: number, approved: boolean) => {
         
-        // change status of request
+        const statusCode = approved ? 2 : 3;
+        updateRequestStatus(requestId, statusCode).then().catch(err => console.error(err));
         onClose();
 
     }
@@ -61,7 +67,7 @@ export default function ModalDialog({ isModalVisible, onClose, requestId }: Moda
                             <span className="font-bold">Status:&nbsp;</span>
                             {requestDetail?.status}
                         </div>
-                        {requestDetail?.status === 'pending' && (
+                        {requestDetail?.status === 'Pending' && (
                             <div className="flex items-center justify-around my-5 py-2">
                                 <button className="py-3 px-5 bg-green-500 rounded-xl text-white font-medium hover:bg-green-700 shadow-lg" onClick={() => handleStatusChange(requestDetail.requestId, true)}>
                                     <div className="flex">

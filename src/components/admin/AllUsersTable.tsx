@@ -1,10 +1,12 @@
 import { createColumnHelper, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, useReactTable } from "@tanstack/react-table";
 import { UserModel } from "../../types/userModel";
 import TableSearch from "../TableSearch"
-import { useState } from "react";
-import { dummyUsers } from "../../data/dummyData";
+import { useEffect, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import ToggleSwitch from "../ToggleSwitch";
+import { allowUser, getUsers } from "../../api/user";
+import { getCookie } from "../../utils/cookieUtil";
+import { decodeJwt } from "../../utils/decodeJwt";
 
 
 export default function AllUserTable() {
@@ -27,15 +29,26 @@ export default function AllUserTable() {
             cell: info => info.getValue(),
             header: "EMAIl"
         }),
-        columnHelper.accessor('status', {
+        columnHelper.accessor('isAllowed', {
             cell: info => <ToggleSwitch switchState={info.getValue() === 'allowed' ? true : false} />,
-            header: "ACTION",
+            header: "ALLOWED",
         })
     ]
 
 
-    const [userData, setUserData] = useState<UserModel[]>(dummyUsers);      // -> user data from api, useEffect to fetch all at once
+    const [userData, setUserData] = useState<UserModel[]>([]);
     const [globalFilter, setGlobalFilter] = useState("");
+
+
+    useEffect(() => {
+
+        const token = getCookie('token') ?? '';
+        const loggedInUserId = decodeJwt(token).UserId;
+        getUsers().then((data: UserModel[]) => {
+            const filteredData = data.filter(e => e.userId != parseInt(loggedInUserId, 10));    // remove the user which is currently logged in
+            setUserData(filteredData);
+        }).catch(err => console.error(err));
+    }, []);
 
     const table = useReactTable({
         data: userData,
@@ -54,14 +67,14 @@ export default function AllUserTable() {
     const handleUserStatus = (userId: unknown, status: unknown) => {
 
         /**
-         * ==> sync the update of status in api 
+         * ==> sync the update of status with api 
          */
 
-        if(status === 'allowed') {
+        if (status === 'allowed') {
             setUserData(prevUserData => {
                 return prevUserData.map(user => {
                     if (user.userId === userId) {
-                        return {...user, status: 'restricted'};
+                        return { ...user, isAllowed: 'restricted' };
                     }
                     return user;
                 });
@@ -70,12 +83,16 @@ export default function AllUserTable() {
             setUserData(prevUserData => {
                 return prevUserData.map(user => {
                     if (user.userId === userId) {
-                        return {...user, status: 'allowed'};
+                        return { ...user, isAllowed: 'allowed' };
                     }
                     return user;
                 });
             });
         }
+
+        allowUser(userId).then().catch(err => console.error(err));
+
+
 
 
     }
@@ -115,10 +132,10 @@ export default function AllUserTable() {
                                             {
                                                 row.getVisibleCells().map((cell) => (
                                                     <td key={cell.id} className="p-3 text-gray-700 whitespace-nowrap" onClick={() => {
-                                                        if(cell.column.id === 'status') {
+                                                        if (cell.column.id === 'isAllowed') {
                                                             const row = cell.row;
                                                             const userId = row.getAllCells().find(c => c.column.id === 'userId')?.getValue();
-                                                            const status = row.getAllCells().find(c => c.column.id === 'status')?.getValue();
+                                                            const status = row.getAllCells().find(c => c.column.id === 'isAllowed')?.getValue();
                                                             handleUserStatus(userId, status);
                                                         }
                                                     }}>
@@ -142,11 +159,11 @@ export default function AllUserTable() {
                     <button onClick={() => { table.nextPage() }} disabled={!table.getCanNextPage()} className="text-lg font-bold p-1 border border-gray-500 px-2 disabled:opacity-30 shadow-lg">
                         <ChevronRight className="w-7 h-7" />
                     </button>
-                    <span className="flex items-center gap-1">
+                    <span className="items-center gap-1 hidden md:flex">
                         <div>Page </div>
                         <strong>{table.getState().pagination.pageIndex + 1} of {" "}{table.getPageCount()}</strong>
                     </span>
-                    <span className="flex items-center gap-1">
+                    <span className="items-center gap-1 hidden md:flex">
                         | Go to page:
                         <input type="number" defaultValue={table.getState().pagination.pageIndex + 1}
                             className="border p-1 rounded bg-transparent w-16"

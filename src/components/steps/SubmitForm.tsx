@@ -1,6 +1,10 @@
 import { useContext, useState } from "react";
 import { StepperContext } from "../../contexts/stepperContext";
 import { useNavigate } from "react-router-dom";
+import { getCookie } from "../../utils/cookieUtil";
+import { decodeJwt } from "../../utils/decodeJwt";
+import { UserRequestAPI } from "../../types/userRequest";
+import { submitRequest } from "../../api/request";
 
 
 interface SubmitFormProps {
@@ -9,14 +13,42 @@ interface SubmitFormProps {
 
 export default function SubmitForm({ callBack }: SubmitFormProps) {
 
-    const { tempData, setFinalData } = useContext(StepperContext);
+    const { tempData } = useContext(StepperContext);
     const [isSubmitted, setIsSubmitted] = useState(false);
     const navigate = useNavigate();
 
+    function getCurrentDate(): string {
+        const today = new Date();
+        const dd = String(today.getDate()).padStart(2, '0');
+        const mm = String(today.getMonth() + 1).padStart(2, '0'); // January is 0!
+        const yyyy = today.getFullYear();
+
+        return yyyy + '-' + mm + '-' + dd;
+    }
+
+    function getPriorityCode(priority: string) {
+        return priority === 'high' ? 1 : priority === 'medium' ? 2 : 3;
+    }
 
     const handleFormSubmit = () => {
         setIsSubmitted(true);
-        setFinalData(tempData);
+
+        const token = getCookie('token') ?? '';
+        const uid = decodeJwt(token).UserId;
+
+        const request: UserRequestAPI = {
+            title: tempData['request-title'],
+            userId: parseInt(uid, 10),
+            phone: tempData.phone,
+            guardianName: tempData['guardian-name'],
+            requestDate: getCurrentDate(),
+            priorityCode: getPriorityCode(tempData['request-priority']),
+            statusCode: 1
+        };
+
+
+        submitRequest(request).then(() => console.log('submitted')).catch(err => console.error(err));
+
         setTimeout(() => {
             navigate("/");
         }, 2000);
@@ -44,11 +76,10 @@ export default function SubmitForm({ callBack }: SubmitFormProps) {
                         isSubmitted ?
                             <div className="text-black font-medium text-2xl mt-7">
                                 Submitted Successfully <span className="text-4xl">🎉</span>
-                            </div> : (<div className="flex flex-col">
+                            </div> : <div className="flex flex-col">
                                 <button className="bg-gray-500 rounded-3xl text-white py-2 font-medium p-14 text-lg mt-10" onClick={() => callBack("previous")}>Review details</button>
                                 <button className="bg-[#20a827] rounded-3xl text-white py-2 font-medium p-14 text-lg mt-5" onClick={handleFormSubmit}>Submit</button>
                             </div>
-                            )
                     }
                 </div>
             </div>

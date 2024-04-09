@@ -12,11 +12,7 @@ export default function NewRequestForm() {
     const [currentStep, setCurrentStep] = useState(1);
     const steps: string[] = ["Basic Details", "Request Details", "Attach File", "Complete"];
 
-    /** form-data */
     const [tempData, setTempData] = useState('');
-    const [finalData, setFinalData] = useState([]);
-    console.log(finalData);     // => send to api
-    /** form-data */
 
     const displayFragments = (step: number) => {
         switch (step) {
@@ -48,17 +44,13 @@ export default function NewRequestForm() {
 
                     <div className="flex justify-center mt-10 mb-5">
                     <div className="w-4/5 py-12 shadow-lg bg-gray-100 rounded-3xl border-2 border-gray-300">
-                        <StepperContext.Provider value={{ tempData, setTempData, finalData, setFinalData }}>
+                        <StepperContext.Provider value={{ tempData, setTempData }}>
                             {displayFragments(currentStep)}
                         </StepperContext.Provider>
                     </div>
                     </div>
-                    
-                    {/* ui breaking on resize */}
                     <div className="flex justify-center">
-                        {
-                            currentStep !== steps.length && <StepperControl callBack={handleClick} currentStep={currentStep} />
-                        }
+                        {currentStep !== steps.length && <StepperControl callBack={handleClick} currentStep={currentStep} />}
                     </div>
                 </div>
             </div>

@@ -1,10 +1,14 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { dummyData } from "../data/dummyData";
 import { createColumnHelper, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, useReactTable } from "@tanstack/react-table";
-import { UserRequest } from "../types/userRequest";
-import TableSearch from "./TableSearch";
+import { UserRequest, UserRequestAPI } from "../types/userRequest";
 import { useNavigate } from "react-router-dom";
 import { CirclePlus, ChevronLeft, ChevronRight } from 'lucide-react';
+import { getUserRequests } from "../api/request";
+import { getCookie } from "../utils/cookieUtil";
+import { decodeJwt } from "../utils/decodeJwt";
+import TableSearch from "./TableSearch";
+
 
 export default function UserRequestTable() {
 
@@ -52,11 +56,30 @@ export default function UserRequestTable() {
 
     ]
 
-    // backend DTO will come with status as string however in backend it is stored as statusCode(int)
-
-
     const [requestData, setRequestData] = useState<UserRequest[]>(dummyData);
+
+    useEffect(() => {
+        const token = getCookie('token') ?? '';
+        const userId = decodeJwt(token).UserId;
+        getUserRequests(parseInt(userId, 10)).then((data: UserRequestAPI[]) => {
+
+            const mappedData: UserRequest[] = data.map((item: UserRequestAPI) => ({
+                requestId: item.requestId,
+                requestDate: item.requestDate,
+                requestTitle: item.title,
+                requestStatus: item.statusCode === 1 ? 'pending' : item.statusCode === 2 ? 'approved' : 'rejected'
+            }));
+
+            setRequestData(mappedData);
+
+        }).catch(err => console.error(err));
+
+    }, []);
+
+
     const [globalFilter, setGlobalFilter] = useState("");
+
+
 
     const table = useReactTable({
         data: requestData,
@@ -135,11 +158,11 @@ export default function UserRequestTable() {
                     <button onClick={() => { table.nextPage() }} disabled={!table.getCanNextPage()} className="text-lg font-bold p-1 border border-gray-500 px-2 disabled:opacity-30 shadow-lg">
                         <ChevronRight className="w-7 h-7" />
                     </button>
-                    <span className="flex items-center gap-1">
+                    <span className="items-center gap-1 hidden md:flex">
                         <div>Page </div>
                         <strong>{table.getState().pagination.pageIndex + 1} of {" "}{table.getPageCount()}</strong>
                     </span>
-                    <span className="flex items-center gap-1">
+                    <span className="items-center gap-1 hidden md:flex">
                         | Go to page:
                         <input type="number" defaultValue={table.getState().pagination.pageIndex + 1}
                             className="border p-1 rounded bg-transparent w-16"

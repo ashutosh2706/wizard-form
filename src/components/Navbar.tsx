@@ -1,15 +1,17 @@
 import { User, LogOut } from "lucide-react";
 import { useState } from "react";
-import { deleteCookie } from "../utils/cookieUtil";
+import { deleteCookie, getCookie } from "../utils/cookieUtil";
+import { decodeJwt } from "../utils/decodeJwt";
+import { Menu } from "lucide-react";
 
 interface NavbarProps {
-    username: string,
     setLoggedIn: React.Dispatch<React.SetStateAction<boolean>>
 }
 
-export default function Navbar({ username, setLoggedIn }: NavbarProps) {
+export default function Navbar({ setLoggedIn }: NavbarProps) {
 
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    const [isMenuExpanded, setMenuExpanded] = useState(false);
 
     function handleLogout() {
         deleteCookie('token');
@@ -17,16 +19,36 @@ export default function Navbar({ username, setLoggedIn }: NavbarProps) {
         setLoggedIn(false);
     }
 
+    const fullName = (): string => {
+        const token = getCookie('token');
+        if (token) {
+            const data = decodeJwt(token);
+            return `${data.FirstName} ${data.LastName}`;
+        }
+        return '';
+    }
+
     return (
         <>
             <nav className="bg-gray-800 p-5">
-                <div className="container mx-auto flex justify-between items-center">
+                <div className="container mx-auto flex justify-between items-center relative">
 
-                    <div className="text-white flex items-center">
-                        <img src='./vite.svg' alt="Logo" className="rounded-full h-10 w-10 mr-2" />
+                    <div className="text-white flex flex-col items-center justify-center">
+                        <img src='./vite.svg' alt="Logo" className="rounded-full h-10 w-10 mr-2 hidden md:block" />
+                        <div className="flex flex-col md:hidden absolute top-0 left-0">
+                            <Menu className="h-10 w-10" onClick={() => setMenuExpanded(!isMenuExpanded)} />
+                            {isMenuExpanded && (
+                                <div className="w-[200px] mt-5 flex flex-col items-center justify-center bg-white bg-opacity-75 backdrop-filter backdrop-blur-lg rounded-lg">
+                                    <a href="#" className="mt-5 w-full text-lg text-black px-5 hover:bg-gray-500 rounded-xl h-8">Home</a>
+                                    <a href="#" className="mt-5 w-full text-lg text-black px-5 hover:bg-gray-500 rounded-xl h-8">About</a>
+                                    <a href="#" className="mt-5 w-full text-lg text-black px-5 hover:bg-gray-500 rounded-xl h-8">Services</a>
+                                    <a href="#" className="mt-5 w-full text-lg text-black px-5 pb-5 hover:bg-gray-500 rounded-xl h-8">Contact</a>
+                                </div>
+                            )}
+                        </div>
                     </div>
 
-                    <div className="text-white">
+                    <div className="text-white hidden md:block">
                         <a href="#" className="mr-5 text-lg">Home</a>
                         <a href="#" className="mr-5 text-lg">About</a>
                         <a href="#" className="mr-5 text-lg">Services</a>
@@ -39,7 +61,7 @@ export default function Navbar({ username, setLoggedIn }: NavbarProps) {
                             <div className="h-10 w-10 flex items-center justify-center bg-gray-300 rounded-full mr-2">
                                 <User className="h-6 w-6 text-gray-600" />
                             </div>
-                            <span className="text-white mr-4 font-medium hover:underline cursor-pointer" onClick={() => setIsDropdownOpen(!isDropdownOpen)}>{username}</span>
+                            <span className="text-white mr-4 font-medium hover:underline cursor-pointer" onClick={() => setIsDropdownOpen(!isDropdownOpen)}>{fullName()}</span>
                         </div>
 
                         {isDropdownOpen && (
@@ -49,10 +71,7 @@ export default function Navbar({ username, setLoggedIn }: NavbarProps) {
                                 </button>
                             </div>
                         )}
-
                     </div>
-
-
                 </div>
             </nav>
         </>

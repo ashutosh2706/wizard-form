@@ -3,5 +3,5 @@ export interface UserModel {
     firstName: string,
     lastName: string,
     email: string,
-    status: string
+    isAllowed: string
 }

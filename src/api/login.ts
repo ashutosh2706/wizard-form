@@ -1,6 +1,4 @@
-import { LoginResponse } from "../types/LoginResponse";
-
-export async function login(email: string, password: string): Promise<LoginResponse> {
+export async function login(email: string, password: string): Promise<string> {
 
     const response = await fetch(import.meta.env.VITE_API_BASE_URL+"Users/login", {
         method: 'POST',
@@ -14,7 +12,7 @@ export async function login(email: string, password: string): Promise<LoginRespo
         throw new Error("Bad Request")
     }
 
-    const responseData: LoginResponse = await response.json();
+    const responseData: string = await response.text();
     
-    return { role: responseData.role, token: responseData.token };
+    return responseData;
 }

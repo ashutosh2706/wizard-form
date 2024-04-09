@@ -1,19 +1,39 @@
 import { createColumnHelper, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, useReactTable } from "@tanstack/react-table";
 import { UserRequestAdmin } from "../../types/userRequestAdmin";
-import { useState } from "react";
-import { dummyRequest } from "../../data/dummyData";
+import { useEffect, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import TableSearch from "../TableSearch"
 import ModalDialog from "../ModalDialog";
+import { getUserRequestsAdmin } from "../../api/request";
+import { UserRequestAPI } from "../../types/userRequest";
 
 
 export default function UserRequestTable() {
 
     const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
-    const [requestIdProp, setRequestIdProp] = useState<number | unknown>();
+    const [requestId, setRequestId] = useState<number | unknown>();
 
-    const [userRequestData, setUserRequestData] = useState<UserRequestAdmin[]>(dummyRequest);       // -> from api as dto, useEffect for initial load
+    const [userRequestData, setUserRequestData] = useState<UserRequestAdmin[]>([]);       // -> from api as dto, useEffect for initial load
     const [globalFilter, setGlobalFilter] = useState("");
+
+
+    useEffect(() => {
+
+        getUserRequestsAdmin().then((data: UserRequestAPI[]) => {
+
+            const mappedData: UserRequestAdmin[] = data.map((item: UserRequestAPI) => ({
+                requestId: item.requestId,
+                userId: item.userId,
+                title: item.title,
+                priority: item.priorityCode === 1 ? 'High' : item.priorityCode === 2 ? 'Normal' : 'Low',
+                status: item.statusCode === 1 ? 'pending' : item.statusCode === 2 ? 'approved' : 'rejected'
+            }));
+
+            setUserRequestData(mappedData);
+
+        }).catch(err => console.error(err));
+
+    }, []);
 
     const columnHelper = createColumnHelper<UserRequestAdmin>();
 
@@ -106,7 +126,11 @@ export default function UserRequestTable() {
                                     table.getRowModel().rows.map((row, index) => (
                                         <tr key={row.id} className={`${index % 2 == 0 ? 'bg-white' : 'bg-gray-100'} hover:bg-slate-200 transition-all duration-100 cursor-pointer`}
                                             onClick={() => {
-                                                setRequestIdProp(row.getAllCells().find(c => c.column.id === 'requestId')?.getValue());
+                                                row.getAllCells().forEach(cell => {
+                                                    if(cell.column.id === 'requestId') {
+                                                        setRequestId(cell.getValue());
+                                                    }
+                                                })
                                                 setIsModalVisible(!isModalVisible);
                                             }}>
                                             {
@@ -132,11 +156,11 @@ export default function UserRequestTable() {
                     <button onClick={() => { table.nextPage() }} disabled={!table.getCanNextPage()} className="text-lg font-bold p-1 border border-gray-500 px-2 disabled:opacity-30 shadow-lg">
                         <ChevronRight className="w-7 h-7" />
                     </button>
-                    <span className="flex items-center gap-1">
+                    <span className="items-center gap-1 hidden md:flex">
                         <div>Page </div>
                         <strong>{table.getState().pagination.pageIndex + 1} of {" "}{table.getPageCount()}</strong>
                     </span>
-                    <span className="flex items-center gap-1">
+                    <span className="items-center gap-1 hidden md:flex">
                         | Go to page:
                         <input type="number" defaultValue={table.getState().pagination.pageIndex + 1}
                             className="border p-1 rounded bg-transparent w-16"
@@ -151,7 +175,7 @@ export default function UserRequestTable() {
 
             </div>
             {/* Modal Dialog */}
-            <ModalDialog requestId={requestIdProp} isModalVisible={isModalVisible} onClose={() => setIsModalVisible(!isModalVisible)} />
+            <ModalDialog requestId={requestId} isModalVisible={isModalVisible} onClose={() => setIsModalVisible(!isModalVisible)} />
         </>
     )
 }
