@@ -14,4 +14,5 @@ export interface UserRequestAPI {
     userId: number,
     statusCode: number,
     title: string
+    file: File | Blob | ArrayBuffer | ArrayBufferView | FormData | null;
 }

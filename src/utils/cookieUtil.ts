@@ -1,6 +1,6 @@
 export const setCookie = (key: string, value: string) => {
     const date = new Date();
-    date.setTime(date.getTime() + (7 * 24 * 60 * 60 * 1000));   // expire cookie after a week
+    date.setTime(date.getTime() + (7 * 24 * 60 * 60 * 1000));   // => make cookie expire in a week
     const expires = "expires=" + date.toUTCString();
     document.cookie = `${key}=${value};${expires};path=/`;
 }

@@ -102,7 +102,7 @@ export default function AllUserTable() {
         <>
             <div className="p-5 bg-gray-100 h-screen">
                 <div className="flex justify-between mb-5 me-5">
-                    <div className="text-md w-72">
+                    <div className="text-md w-auto">
                         <TableSearch debounce={500} initValue={globalFilter ?? ""} onChange={(value) => setGlobalFilter(String(value))} />
                     </div>
                 </div>

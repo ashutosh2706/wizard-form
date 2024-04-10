@@ -37,7 +37,7 @@ export default function NewRequestForm() {
     return (
         <>
             <div className="h-screen flex justify-center items-center bg-gray-50">
-                <div className="md:w-1/2 mx-auto rounded-2xl pb-2 bg-gray-50 border-gray-400 flex flex-col h-screen">
+                <div className="md:w-1/2 w-full mx-auto rounded-2xl pb-2 bg-gray-50 border-gray-400 flex flex-col h-screen">
                     <div className="container mt-5 mb-5">
                         <Stepper steps={steps} currentStep={currentStep} />
                     </div>

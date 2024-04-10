@@ -20,7 +20,7 @@ export default function SubmitForm({ callBack }: SubmitFormProps) {
     function getCurrentDate(): string {
         const today = new Date();
         const dd = String(today.getDate()).padStart(2, '0');
-        const mm = String(today.getMonth() + 1).padStart(2, '0'); // January is 0!
+        const mm = String(today.getMonth() + 1).padStart(2, '0');
         const yyyy = today.getFullYear();
 
         return yyyy + '-' + mm + '-' + dd;
@@ -31,19 +31,24 @@ export default function SubmitForm({ callBack }: SubmitFormProps) {
     }
 
     const handleFormSubmit = () => {
+
+        console.error(tempData);
+
         setIsSubmitted(true);
 
         const token = getCookie('token') ?? '';
         const uid = decodeJwt(token).UserId;
 
         const request: UserRequestAPI = {
+            requestId: 0,   // => this is auto-generated in backend
             title: tempData['request-title'],
             userId: parseInt(uid, 10),
             phone: tempData.phone,
             guardianName: tempData['guardian-name'],
             requestDate: getCurrentDate(),
             priorityCode: getPriorityCode(tempData['request-priority']),
-            statusCode: 1
+            statusCode: 1,
+            file: tempData['file-upload'],
         };
 
 

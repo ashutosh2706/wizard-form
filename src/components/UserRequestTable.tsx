@@ -98,16 +98,19 @@ export default function UserRequestTable() {
         <>
             <div className="p-5 bg-gray-100 h-screen">
                 <div className="flex justify-between mb-5 me-5">
-                    <div className="text-md w-72">
+                    <div className="text-md w-auto">
                         <TableSearch debounce={500} initValue={globalFilter ?? ""} onChange={(value) => setGlobalFilter(String(value))} />
                     </div>
                     <div className="text-xl">
-                        <button className="w-52 bg-[#4369ff] rounded-xl text-white py-2 font-medium hover:bg-[#3451c7]" onClick={() => navigate("/new-request")}>
+                        <button className="hidden md:block w-52 bg-[#4369ff] rounded-xl text-white py-2 font-medium hover:bg-[#3451c7]" onClick={() => navigate("/new-request")}>
                             <div className="flex items-center justify-center">
                                 <CirclePlus className="h-6 w-6 text-white mr-2" />
-                                New Request
+                                <span>New Request</span>
                             </div>
                         </button>
+                        <div className="md:hidden flex items-center justify-center">
+                            <CirclePlus className="w-10 h-10 mr-2 stroke-[#4369ff] cursor-pointer hover:stroke-black" onClick={() => navigate("/new-request")} />
+                        </div>
                     </div>
                 </div>
                 <div className="overflow-auto rounded-lg shadow-xl border border-gray-400">
