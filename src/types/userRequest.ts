@@ -1,3 +1,5 @@
+import { AttachedFile } from "./AttachedFile"
+
 export interface UserRequest {
     requestId: number,
     requestDate: string,
@@ -14,5 +16,5 @@ export interface UserRequestAPI {
     userId: number,
     statusCode: number,
     title: string
-    file: File | Blob | ArrayBuffer | ArrayBufferView | FormData | null;
+    attachedFile: AttachedFile | null
 }

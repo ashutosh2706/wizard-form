@@ -30,15 +30,10 @@ export default function UplodadFile() {
     const attachFile = (fileList: FileList | null) => {
         if (fileList && fileList.length > 0) {
             const file = fileList[0];
-            const reader = new FileReader();
-            reader.onload = (event) => {
-                const fileContent = event.target?.result;
-                setTempData({ ...tempData, "file-upload": fileContent, "file-name": file.name });
-                setIsFileSelected(true);
-            };
-            reader.readAsDataURL(file);
+            setTempData({ ...tempData, "file-data": file, "file-name": file.name });
+            setIsFileSelected(true);
         } else {
-            setTempData({ ...tempData, "file-upload": "", "file-name": "" });
+            setTempData({ ...tempData, "file-data": ""});
         }
     }
 

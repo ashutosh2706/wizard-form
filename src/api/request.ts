@@ -66,20 +66,17 @@ export async function getRequestByRequestId(requestId: number): Promise<UserRequ
 
     if(!response.ok) throw new Error("Bad Request");
 
-    const responseData: UserRequestAPI = await response.json();
+    const responseData: UserRequestAPI = await response.json(); 
     return responseData;
 }
 
-export async function submitRequest(requestData: UserRequestAPI) {
+export async function submitRequest(requestData: FormData) {
 
     const response = await fetch(import.meta.env.VITE_API_BASE_URL + 'Requests', {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(requestData)
+        body: requestData
     });
 
     if(!response.ok) throw new Error("Bad Request");
-
+    
 }

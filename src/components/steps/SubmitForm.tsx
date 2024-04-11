@@ -3,7 +3,6 @@ import { StepperContext } from "../../contexts/stepperContext";
 import { useNavigate } from "react-router-dom";
 import { getCookie } from "../../utils/cookieUtil";
 import { decodeJwt } from "../../utils/decodeJwt";
-import { UserRequestAPI } from "../../types/userRequest";
 import { submitRequest } from "../../api/request";
 
 
@@ -34,29 +33,22 @@ export default function SubmitForm({ callBack }: SubmitFormProps) {
 
         console.error(tempData);
 
-        setIsSubmitted(true);
-
         const token = getCookie('token') ?? '';
         const uid = decodeJwt(token).UserId;
 
-        const request: UserRequestAPI = {
-            requestId: 0,   // => this is auto-generated in backend
-            title: tempData['request-title'],
-            userId: parseInt(uid, 10),
-            phone: tempData.phone,
-            guardianName: tempData['guardian-name'],
-            requestDate: getCurrentDate(),
-            priorityCode: getPriorityCode(tempData['request-priority']),
-            statusCode: 1,
-            file: tempData['file-upload'],
-        };
-
-
-        submitRequest(request).then(() => console.log('submitted')).catch(err => console.error(err));
-
-        setTimeout(() => {
-            navigate("/");
-        }, 2000);
+        const formData = new FormData();
+        formData.append('title', tempData['request-title']);
+        formData.append('userId', parseInt(uid, 10).toString());
+        formData.append('phone', tempData.phone);
+        formData.append('guardianName', tempData['guardian-name']);
+        formData.append('requestDate', getCurrentDate());
+        formData.append('priorityCode', getPriorityCode(tempData['request-priority']).toString());
+        formData.append('attachedFile', tempData['file-data']);
+        
+        submitRequest(formData).then(() => {
+            setIsSubmitted(true);
+            setTimeout(() => navigate("/"), 2000);
+        }).catch(err => console.error(err));
     }
 
     return (
