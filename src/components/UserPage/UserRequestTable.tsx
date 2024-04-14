@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react"
-import { dummyData } from "../data/dummyData";
+import { dummyData } from "../../data/dummyData";
 import { createColumnHelper, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, useReactTable } from "@tanstack/react-table";
-import { UserRequest, UserRequestAPI } from "../types/userRequest";
+import { UserRequest, UserRequestAPI } from "../../types/userRequest";
 import { useNavigate } from "react-router-dom";
 import { CirclePlus, ChevronLeft, ChevronRight } from 'lucide-react';
-import { getUserRequests } from "../api/request";
-import { getCookie } from "../utils/cookieUtil";
-import { decodeJwt } from "../utils/decodeJwt";
-import TableSearch from "./TableSearch";
+import { getCookie } from "../../utils/cookieUtil";
+import { decodeJwt } from "../../utils/decodeJwt";
+import TableSearch from "../TableSearch";
+import { requestService } from "../../services/requestService";
 
 
 export default function UserRequestTable() {
@@ -61,8 +61,7 @@ export default function UserRequestTable() {
     useEffect(() => {
         const token = getCookie('token') ?? '';
         const userId = decodeJwt(token).UserId;
-        getUserRequests(parseInt(userId, 10)).then((data: UserRequestAPI[]) => {
-
+        requestService.getUserRequests(parseInt(userId, 10)).then((data: UserRequestAPI[]) => {
             const mappedData: UserRequest[] = data.map((item: UserRequestAPI) => ({
                 requestId: item.requestId,
                 requestDate: item.requestDate,

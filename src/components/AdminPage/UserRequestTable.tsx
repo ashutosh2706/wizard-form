@@ -4,8 +4,8 @@ import { useEffect, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import TableSearch from "../TableSearch"
 import ModalDialog from "../ModalDialog";
-import { getUserRequestsAdmin } from "../../api/request";
 import { UserRequestAPI } from "../../types/userRequest";
+import { requestService } from "../../services/requestService";
 
 
 export default function UserRequestTable() {
@@ -19,7 +19,7 @@ export default function UserRequestTable() {
 
     useEffect(() => {
 
-        getUserRequestsAdmin().then((data: UserRequestAPI[]) => {
+        requestService.getUserRequestsAdmin().then((data: UserRequestAPI[]) => {
 
             const mappedData: UserRequestAdmin[] = data.map((item: UserRequestAPI) => ({
                 requestId: item.requestId,

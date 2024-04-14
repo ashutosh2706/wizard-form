@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Homepage from "./Homepage";
-import { login } from "../api/login";
 import { getCookie, setCookie } from "../utils/cookieUtil";
 import { decodeJwt } from "../utils/decodeJwt";
+import authService from "../services/authService";
 
 export default function Login() {
 
@@ -25,13 +25,13 @@ export default function Login() {
 
     function loginUser(email: string, password: string) {
 
-        login(email, password).then((data) => {
+        authService.login(email, password).then((data) => {
             const role = decodeJwt(data).RoleType;
             setCookie('token', data);
             setCookie('role', role);
             setRole(role);
             setLoggedIn(true);
-        }).catch(error => console.error(error));
+        }).catch(error => console.error(error)); 
         
     }
 

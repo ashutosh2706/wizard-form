@@ -1,6 +1,6 @@
 import Navbar from "../components/Navbar";
-import Tab from "../components/Tab";
-import UserRequestTable from "../components/UserRequestTable";
+import AdminPage from "../components/AdminPage";
+import UserPage from "../components/UserPage";
 
 
 interface HomepageProps {
@@ -13,8 +13,8 @@ export default function Homepage({ role, setLoggedIn }: HomepageProps) {
     return (
         <>
             <Navbar setLoggedIn={setLoggedIn} />
-            {role === 'admin' && (<Tab />)}
-            {role === 'user' && (<UserRequestTable />)}
+            {role === 'admin' && (<AdminPage />)}
+            {role === 'user' && (<UserPage />)}
         </>
     )
 }

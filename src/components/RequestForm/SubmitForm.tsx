@@ -3,7 +3,7 @@ import { StepperContext } from "../../contexts/stepperContext";
 import { useNavigate } from "react-router-dom";
 import { getCookie } from "../../utils/cookieUtil";
 import { decodeJwt } from "../../utils/decodeJwt";
-import { submitRequest } from "../../api/request";
+import { requestService } from "../../services/requestService";
 
 
 interface SubmitFormProps {
@@ -45,7 +45,7 @@ export default function SubmitForm({ callBack }: SubmitFormProps) {
         formData.append('priorityCode', getPriorityCode(tempData['request-priority']).toString());
         formData.append('attachedFile', tempData['file-data']);
         
-        submitRequest(formData).then(() => {
+        requestService.submitRequest(formData).then(() => {
             setIsSubmitted(true);
             setTimeout(() => navigate("/"), 2000);
         }).catch(err => console.error(err));

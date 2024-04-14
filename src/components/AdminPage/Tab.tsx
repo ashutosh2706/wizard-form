@@ -1,6 +1,6 @@
 import { useState } from "react"
-import AllUserTable from "./admin/AllUsersTable";
-import UserRequestTable from "./admin/UserRequestTable";
+import AllUserTable from "./AllUsersTable";
+import UserRequestTable from "./UserRequestTable";
 
 export default function Tab() {
 

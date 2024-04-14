@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { X, Check } from "lucide-react";
 import { UserRequestAdmin } from "../types/userRequestAdmin";
-import { getRequestByRequestId, updateRequestStatus } from "../api/request";
 import { UserRequestAPI } from "../types/userRequest";
+import { requestService } from "../services/requestService";
 
 interface ModalProps {
     isModalVisible: boolean,
@@ -20,7 +20,7 @@ export default function ModalDialog({ isModalVisible, onClose, requestId }: Moda
         
         if(typeof requestId === 'number') {
 
-            getRequestByRequestId(requestId).then((data: UserRequestAPI) => {
+            requestService.getRequestByRequestId(requestId).then((data: UserRequestAPI) => {
                 const request: UserRequestAdmin = {
                     requestId: data.requestId,
                     userId: data.userId,
@@ -39,9 +39,8 @@ export default function ModalDialog({ isModalVisible, onClose, requestId }: Moda
     const handleStatusChange = (requestId: number, approved: boolean) => {
         
         const statusCode = approved ? 2 : 3;
-        updateRequestStatus(requestId, statusCode).then().catch(err => console.error(err));
+        requestService.updateRequestStatus(requestId, statusCode).then().catch(err => console.error(err));
         onClose();
-
     }
 
 

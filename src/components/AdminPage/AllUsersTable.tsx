@@ -4,9 +4,9 @@ import TableSearch from "../TableSearch"
 import { useEffect, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import ToggleSwitch from "../ToggleSwitch";
-import { allowUser, getUsers } from "../../api/user";
 import { getCookie } from "../../utils/cookieUtil";
 import { decodeJwt } from "../../utils/decodeJwt";
+import { userService } from "../../services/userService";
 
 
 export default function AllUserTable() {
@@ -44,10 +44,12 @@ export default function AllUserTable() {
 
         const token = getCookie('token') ?? '';
         const loggedInUserId = decodeJwt(token).UserId;
-        getUsers().then((data: UserModel[]) => {
+
+        userService.getUsers().then((data: UserModel[]) => {
             const filteredData = data.filter(e => e.userId != parseInt(loggedInUserId, 10));    // remove the user which is currently logged in
             setUserData(filteredData);
         }).catch(err => console.error(err));
+
     }, []);
 
     const table = useReactTable({
@@ -90,11 +92,7 @@ export default function AllUserTable() {
             });
         }
 
-        allowUser(userId).then().catch(err => console.error(err));
-
-
-
-
+        userService.allowUser(userId).then().catch(err => console.error(err));
     }
 
 

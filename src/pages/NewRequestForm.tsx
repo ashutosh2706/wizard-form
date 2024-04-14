@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { StepperContext } from "../contexts/stepperContext";
-import Stepper from "../components/Stepper";
-import StepperControl from "../components/StepperControl";
-import RequestDetails from "../components/steps/RequestDetails";
-import SubmitForm from "../components/steps/SubmitForm";
-import BasicDetails from "../components/steps/BasicDetails";
-import UplodadFile from "../components/steps/UploadFile";
+import Stepper from "../components/RequestForm/Stepper";
+import StepperControl from "../components/RequestForm/StepperControl";
+import RequestDetails from "../components/RequestForm/RequestDetails";
+import SubmitForm from "../components/RequestForm/SubmitForm";
+import BasicDetails from "../components/RequestForm/BasicDetails";
+import UplodadFile from "../components/RequestForm/UploadFile";
 
 export default function NewRequestForm() {
 

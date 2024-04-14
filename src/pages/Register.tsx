@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { register } from "../api/register";
+import authService from "../services/authService";
 
 
 export default function Register() {
@@ -15,11 +15,10 @@ export default function Register() {
         const password = formData.get("password") as string;
 
         const roleId: number = adminRole ? 2 : 1;
-        register(firstname, lastname, email, password, roleId).then((res) => {
-            console.log(res);
+        authService.register(firstname, lastname, email, password, roleId).then(() => {
             window.alert('Registered Successfully');
             navigate("/");
-        }).catch(err => console.error(err));
+        }).catch(error => console.error(error));
     }
 
     return (
