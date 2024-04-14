@@ -9,7 +9,8 @@ export async function getUsers(): Promise<UserModel[]> {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
-            "Authorization": `Bearer ${token}`
+            "Authorization": `Bearer ${token}`,
+            'api-key': import.meta.env.VITE_API_KEY
         }
     });
 
@@ -30,7 +31,8 @@ export async function allowUser(userId: unknown): Promise<void> {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
-            "Authorization": `Bearer ${token}`
+            "Authorization": `Bearer ${token}`,
+            'api-key': import.meta.env.VITE_API_KEY
         }
     });
 

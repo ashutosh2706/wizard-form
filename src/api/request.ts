@@ -6,7 +6,8 @@ export async function getUserRequests(userId: number): Promise<UserRequestAPI[]>
     const response = await fetch(import.meta.env.VITE_API_BASE_URL + 'Requests/user/' + userId, {
         method: 'GET',
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'api-key': import.meta.env.VITE_API_KEY
         }
     });
 
@@ -27,7 +28,8 @@ export async function getUserRequestsAdmin(): Promise<UserRequestAPI[]> {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
-            "Authorization": `Bearer ${token}`
+            "Authorization": `Bearer ${token}`,
+            'api-key': import.meta.env.VITE_API_KEY
         }
     });
 
@@ -48,7 +50,8 @@ export async function updateRequestStatus(requestId: number, statusCode: number)
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
-            "Authorization": `Bearer ${token}`
+            "Authorization": `Bearer ${token}`,
+            'api-key': import.meta.env.VITE_API_KEY
         }
     });
 
@@ -60,7 +63,8 @@ export async function getRequestByRequestId(requestId: number): Promise<UserRequ
     const response = await fetch(import.meta.env.VITE_API_BASE_URL + 'Requests/' + requestId, {
         method: 'GET',
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'api-key': import.meta.env.VITE_API_KEY
         }
     });
 
@@ -74,6 +78,9 @@ export async function submitRequest(requestData: FormData) {
 
     const response = await fetch(import.meta.env.VITE_API_BASE_URL + 'Requests', {
         method: 'POST',
+        headers: {
+            'api-key': import.meta.env.VITE_API_KEY
+        },
         body: requestData
     });
 

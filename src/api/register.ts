@@ -3,7 +3,8 @@ export const register = async (firstName: string, lastName: string, email: strin
     const response = await fetch(import.meta.env.VITE_API_BASE_URL+"Users", {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'api-key': import.meta.env.VITE_API_KEY
         },
         body: JSON.stringify({firstName, lastName, email, password, roleId})
     });
