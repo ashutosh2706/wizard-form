@@ -11,7 +11,7 @@ export const requestService = {
             const response = await api.get('Requests/user/' + userId);
             return response.data;
         } catch (error) {
-            throw new Error('Bad Request');
+            throw new Error("An error occurred while fetching requests");
         }
     },
 
@@ -20,7 +20,7 @@ export const requestService = {
             const response = await api.get('Requests');
             return response.data;
         } catch (error) {
-            throw new Error('Bad Request');
+            throw new Error("An error occurred while fetching requests");
         }
     },
 
@@ -28,7 +28,7 @@ export const requestService = {
         try {
             await api.put('Requests/update/' + requestId + '/' + statusCode);
         } catch (error) {
-            throw new Error('Bad Request');
+            throw new Error("An error occurred while updating request status");
         }
     },
 
@@ -37,7 +37,7 @@ export const requestService = {
             const response = await api.get('Requests/' + requestId);
             return response.data;
         } catch (error) {
-            throw new Error('Bad Request');
+            throw new Error("An error occurred while fetching request details");
         }
     },
     

@@ -31,7 +31,7 @@ export default function RequestDetails() {
                         <input
                             onChange={handleChange}
                             value={tempData["request-title"] || ""}
-                            className="p-2 rounded-xl border border-gray-300" type="text" name="request-title" placeholder="What this request is for" />
+                            className="p-2 rounded-xl border border-gray-300" type="text" name="request-title" placeholder="What this request is for" maxLength={40}/>
                         <div className="font-bold h-6 mt-3 text-sm leading-8 uppercase"> Description <span className="text-red-600 font-bold text-lg"></span></div>
                         <input
                             onChange={handleChange}

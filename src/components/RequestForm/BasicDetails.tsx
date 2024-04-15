@@ -10,7 +10,7 @@ export default function BasicDetails() {
     const handleChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
         const target = e.target as HTMLInputElement;
         const { name, value } = target;
-        setTempData({ ...tempData, [name]: value })
+        setTempData({ ...tempData, [name]: value });
     }
 
 

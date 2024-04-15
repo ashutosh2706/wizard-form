@@ -1,16 +1,17 @@
 import { useEffect, useState } from "react";
 import { X, Check } from "lucide-react";
-import { UserRequestAdmin } from "../types/userRequestAdmin";
-import { UserRequestAPI } from "../types/userRequest";
-import { requestService } from "../services/requestService";
+import { UserRequestAdmin } from "../../types/userRequestAdmin";
+import { UserRequestAPI } from "../../types/userRequest";
+import { requestService } from "../../services/requestService";
 
 interface ModalProps {
     isModalVisible: boolean,
     onClose: () => void,
-    requestId: number | unknown
+    requestId: number | unknown,
+    reRenderComponent: () => void
 }
 
-export default function ModalDialog({ isModalVisible, onClose, requestId }: ModalProps) {
+export default function ModalDialog({ isModalVisible, onClose, requestId, reRenderComponent }: ModalProps) {
 
 
     const [requestDetail, setRequestDetail] = useState<UserRequestAdmin>();
@@ -29,7 +30,7 @@ export default function ModalDialog({ isModalVisible, onClose, requestId }: Moda
                     status: data.statusCode === 1 ? 'Pending' : data.statusCode === 2 ? 'Approved' : 'Rejected'
                 }
                 setRequestDetail(request);
-            }).catch(err => console.error(err));
+            }).catch((error: Error) => window.alert(error.message));
         }
 
     }, [requestId]);
@@ -39,8 +40,11 @@ export default function ModalDialog({ isModalVisible, onClose, requestId }: Moda
     const handleStatusChange = (requestId: number, approved: boolean) => {
         
         const statusCode = approved ? 2 : 3;
-        requestService.updateRequestStatus(requestId, statusCode).then().catch(err => console.error(err));
-        onClose();
+        requestService.updateRequestStatus(requestId, statusCode).then(() => {
+            reRenderComponent();
+            onClose();
+        }).catch((error: Error) => window.alert(error.message));
+        
     }
 
 

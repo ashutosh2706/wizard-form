@@ -31,7 +31,7 @@ export default function Login() {
             setCookie('role', role);
             setRole(role);
             setLoggedIn(true);
-        }).catch(error => console.error(error)); 
+        }).catch((error: Error) => window.alert(error.message)); 
         
     }
 

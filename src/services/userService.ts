@@ -11,7 +11,7 @@ export const userService = {
             const response = await api.get('Users');
             return response.data;
         } catch (error) {
-            throw new Error('Bad Request');
+            throw new Error("An error occurred while fetching users");
         }
     },
     
@@ -20,7 +20,15 @@ export const userService = {
             const response = await api.put('Users/allow/' + userId);
             return response.data;
         } catch (error) {
-            throw new Error('Bad Request');
+            throw new Error("An error occurred while performing the requested action");
+        }
+    },
+    
+    changeRole: async(userId: number, roleId: number): Promise<void> => {
+        try {
+            await api.put('Users/roles', {userId, roleId});
+        } catch (error) {
+            throw new Error("An error occurred while performing the requested action");
         }
     }
 }

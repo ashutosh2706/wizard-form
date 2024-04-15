@@ -2,7 +2,7 @@ import { createColumnHelper, flexRender, getCoreRowModel, getFilteredRowModel, g
 import { UserModel } from "../../types/userModel";
 import TableSearch from "../TableSearch"
 import { useEffect, useState } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Settings } from "lucide-react";
 import ToggleSwitch from "../ToggleSwitch";
 import { getCookie } from "../../utils/cookieUtil";
 import { decodeJwt } from "../../utils/decodeJwt";
@@ -32,12 +32,33 @@ export default function AllUserTable() {
         columnHelper.accessor('isAllowed', {
             cell: info => <ToggleSwitch switchState={info.getValue() === 'allowed' ? true : false} />,
             header: "ALLOWED",
+        }),
+        columnHelper.accessor('roleId', {
+            cell: info => {
+                if(info.getValue() === 1) {
+                    return (
+                        <div className="flex items-center justify-start gap-2">
+                            <span>User</span>
+                            <Settings className="w-5 h-5 cursor-pointer"/>
+                        </div>
+                    )
+                } else {
+                    return (
+                        <div className="flex items-center justify-start gap-2">
+                            <span>Admin</span>
+                            <Settings className="w-5 h-5 cursor-pointer"/>
+                        </div>
+                    )
+                }
+            },
+            header: "Role"
         })
     ]
 
 
     const [userData, setUserData] = useState<UserModel[]>([]);
     const [globalFilter, setGlobalFilter] = useState("");
+    const [renderComponent, setRenderComponent] = useState<boolean>(false);
 
 
     useEffect(() => {
@@ -48,9 +69,9 @@ export default function AllUserTable() {
         userService.getUsers().then((data: UserModel[]) => {
             const filteredData = data.filter(e => e.userId != parseInt(loggedInUserId, 10));    // remove the user which is currently logged in
             setUserData(filteredData);
-        }).catch(err => console.error(err));
+        }).catch((error: Error) => window.alert(error.message));
 
-    }, []);
+    }, [renderComponent]);
 
     const table = useReactTable({
         data: userData,
@@ -66,10 +87,20 @@ export default function AllUserTable() {
     table.getState().pagination.pageSize = 10;          // -> number of rows per page
 
 
+    const handleRoleChange = (userId: unknown, roleId: unknown) => {
+        if(typeof userId === 'number' && typeof roleId === 'number') {
+            const newRoleId = roleId === 1 ? 2 : 1;
+            userService.changeRole(userId, newRoleId).then(() => {
+                setRenderComponent(!renderComponent);   // better to open a modal dialog
+            }).catch((error: Error) => window.alert(error.message));
+        }
+    }
+
+
     const handleUserStatus = (userId: unknown, status: unknown) => {
 
         /**
-         * ==> sync the update of status with api 
+         * ==> sync the update of status with api
          */
 
         if (status === 'allowed') {
@@ -92,7 +123,7 @@ export default function AllUserTable() {
             });
         }
 
-        userService.allowUser(userId).then().catch(err => console.error(err));
+        userService.allowUser(userId).then().catch((error: Error) => window.alert(error.message));
     }
 
 
@@ -106,7 +137,7 @@ export default function AllUserTable() {
                 </div>
                 <div className="overflow-auto rounded-lg shadow-xl border border-gray-400">
                     <table className="shadow-lg w-full rounded-xl overflow-hidden">
-                        <caption className="text-start text-xl p-5 font-medium" >All Users</caption>
+                        <caption className="text-start text-xl p-5 font-medium" >Account Requests</caption>
                         <thead className="bg-white border-b-2 border-gray-200">
                             {
                                 table.getHeaderGroups().map((headerGroup) => (
@@ -135,6 +166,11 @@ export default function AllUserTable() {
                                                             const userId = row.getAllCells().find(c => c.column.id === 'userId')?.getValue();
                                                             const status = row.getAllCells().find(c => c.column.id === 'isAllowed')?.getValue();
                                                             handleUserStatus(userId, status);
+                                                        } else if(cell.column.id === 'roleId') {
+                                                            const row = cell.row;
+                                                            const userId = row.getAllCells().find(c => c.column.id === 'userId')?.getValue();
+                                                            const roleId = row.getAllCells().find(c => c.column.id === 'roleId')?.getValue();
+                                                            handleRoleChange(userId, roleId);
                                                         }
                                                     }}>
                                                         {flexRender(cell.column.columnDef.cell, cell.getContext())}

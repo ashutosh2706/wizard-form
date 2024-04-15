@@ -1,4 +1,4 @@
-import { AxiosInstance } from "axios";
+import { AxiosError, AxiosInstance } from "axios";
 import apiConfig from "../api/apiConfig";
 
 
@@ -11,7 +11,12 @@ const authService = {
             const response = await api.post('Users/login', {email, password});
             return response.data;
         } catch (error) {
-            throw new Error("Login Failed");
+            if(error instanceof AxiosError) {
+                if(error.response?.status === 400) throw new Error(`${error.response.status}: Account has not been activated`);
+                else throw new Error(`${error.response?.status}: ${error.response?.data}`);
+            } else {
+                throw new Error("An error occurred while logging in.");
+            }
         }
     },
 
@@ -20,7 +25,7 @@ const authService = {
             const response = await api.post('Users', {firstName, lastName, email, password, roleId});
             return response.data;
         } catch (error) {
-            throw new Error("Register Failed");
+            throw new Error("An error occurred while registering user.");
         }
     }
     

@@ -31,8 +31,6 @@ export default function SubmitForm({ callBack }: SubmitFormProps) {
 
     const handleFormSubmit = () => {
 
-        console.error(tempData);
-
         const token = getCookie('token') ?? '';
         const uid = decodeJwt(token).UserId;
 
@@ -48,7 +46,7 @@ export default function SubmitForm({ callBack }: SubmitFormProps) {
         requestService.submitRequest(formData).then(() => {
             setIsSubmitted(true);
             setTimeout(() => navigate("/"), 2000);
-        }).catch(err => console.error(err));
+        }).catch(err => window.alert(err));
     }
 
     return (

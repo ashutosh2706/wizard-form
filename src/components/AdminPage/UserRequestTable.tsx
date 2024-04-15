@@ -1,23 +1,24 @@
-import { createColumnHelper, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, useReactTable } from "@tanstack/react-table";
+import { SortingState, createColumnHelper, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, useReactTable } from "@tanstack/react-table";
 import { UserRequestAdmin } from "../../types/userRequestAdmin";
 import { useEffect, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import TableSearch from "../TableSearch"
-import ModalDialog from "../ModalDialog";
+import ModalDialog from "./ModalDialog";
 import { UserRequestAPI } from "../../types/userRequest";
 import { requestService } from "../../services/requestService";
 
 
 export default function UserRequestTable() {
 
+    const [renderComponent, setRenderComponent] = useState<boolean>(false);
     const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
     const [requestId, setRequestId] = useState<number | unknown>();
-
     const [userRequestData, setUserRequestData] = useState<UserRequestAdmin[]>([]);
     const [globalFilter, setGlobalFilter] = useState("");
+    const [sorting, setSorting] = useState<SortingState>([]);
 
 
-    useEffect(() => {
+    const fetchData = () => {
 
         requestService.getUserRequestsAdmin().then((data: UserRequestAPI[]) => {
 
@@ -31,17 +32,18 @@ export default function UserRequestTable() {
 
             setUserRequestData(mappedData);
 
-        }).catch(err => console.error(err));
+        }).catch((error: Error) => window.alert(error.message));
+    }
 
-    }, []);
+    useEffect(() => fetchData(), [renderComponent]);
 
     const columnHelper = createColumnHelper<UserRequestAdmin>();
-
 
     const defaultColumns = [
         columnHelper.accessor('requestId', {
             cell: info => info.getValue(),
             header: "REQUEST ID"
+
         }),
         columnHelper.accessor('userId', {
             cell: info => info.getValue(),
@@ -83,16 +85,21 @@ export default function UserRequestTable() {
     const table = useReactTable({
         data: userRequestData,
         columns: defaultColumns,
+        enableSorting: true,
         state: {
-            globalFilter
+            globalFilter,
+            sorting: sorting
         },
         getFilteredRowModel: getFilteredRowModel(),
         getCoreRowModel: getCoreRowModel(),
-        getPaginationRowModel: getPaginationRowModel()
+        getPaginationRowModel: getPaginationRowModel(),
+        getSortedRowModel: getSortedRowModel(),
+        onSortingChange: setSorting
     })
 
 
     table.getState().pagination.pageSize = 10;
+
 
     return (
         <>
@@ -111,8 +118,14 @@ export default function UserRequestTable() {
                                     <tr key={headerGroup.id}>
                                         {
                                             headerGroup.headers.map(header => (
-                                                <th key={header.id} className="p-3 text-md font-semibold tracking-wide text-left whitespace-nowrap">
-                                                    {flexRender(header.column.columnDef.header, header.getContext())}
+                                                <th key={header.id} className="p-3 text-md font-semibold tracking-wide text-left whitespace-nowrap" colSpan={header.colSpan}>
+                                                    {header.isPlaceholder ? null : (
+                                                        <div className={header.column.getCanSort() ? 'cursor-pointer select-none' : ''} onClick={header.column.getToggleSortingHandler()}
+                                                            title={header.column.getCanSort() ? header.column.getNextSortingOrder() === 'asc' ? 'Sort ascending' : header.column.getNextSortingOrder() === 'desc' ? 'Sort descending' : 'Clear sort' : undefined}>
+                                                            {flexRender(header.column.columnDef.header, header.getContext())}
+                                                            {{ asc: ' 🔼', desc: ' 🔽', }[header.column.getIsSorted() as string] ?? null}
+                                                        </div>
+                                                    )}
                                                 </th>
                                             ))
                                         }
@@ -127,7 +140,7 @@ export default function UserRequestTable() {
                                         <tr key={row.id} className={`${index % 2 == 0 ? 'bg-white' : 'bg-gray-100'} hover:bg-slate-200 transition-all duration-100 cursor-pointer`}
                                             onClick={() => {
                                                 row.getAllCells().forEach(cell => {
-                                                    if(cell.column.id === 'requestId') {
+                                                    if (cell.column.id === 'requestId') {
                                                         setRequestId(cell.getValue());
                                                     }
                                                 })
@@ -175,7 +188,7 @@ export default function UserRequestTable() {
 
             </div>
             {/* Modal Dialog */}
-            <ModalDialog requestId={requestId} isModalVisible={isModalVisible} onClose={() => setIsModalVisible(!isModalVisible)} />
+            <ModalDialog requestId={requestId} isModalVisible={isModalVisible} reRenderComponent={() => setRenderComponent(!renderComponent)} onClose={() => setIsModalVisible(!isModalVisible)} />
         </>
     )
 }

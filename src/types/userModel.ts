@@ -3,5 +3,6 @@ export interface UserModel {
     firstName: string,
     lastName: string,
     email: string,
-    isAllowed: string
+    isAllowed: string,
+    roleId: number
 }

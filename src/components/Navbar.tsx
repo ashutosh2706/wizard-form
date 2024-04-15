@@ -48,12 +48,12 @@ export default function Navbar({ setLoggedIn }: NavbarProps) {
                         </div>
                     </div>
 
-                    <div className="text-white hidden md:block">
+                    {/* <div className="text-white hidden md:block">
                         <a href="#" className="mr-5 text-lg">Home</a>
                         <a href="#" className="mr-5 text-lg">About</a>
                         <a href="#" className="mr-5 text-lg">Services</a>
                         <a href="#" className="mr-5 text-lg">Contact</a>
-                    </div>
+                    </div> */}
 
 
                     <div className="relative">

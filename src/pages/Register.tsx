@@ -18,7 +18,7 @@ export default function Register() {
         authService.register(firstname, lastname, email, password, roleId).then(() => {
             window.alert('Registered Successfully');
             navigate("/");
-        }).catch(error => console.error(error));
+        }).catch((error: Error) => window.alert(error.message));
     }
 
     return (

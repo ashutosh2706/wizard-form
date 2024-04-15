@@ -6,19 +6,20 @@ import RequestDetails from "../components/RequestForm/RequestDetails";
 import SubmitForm from "../components/RequestForm/SubmitForm";
 import BasicDetails from "../components/RequestForm/BasicDetails";
 import UplodadFile from "../components/RequestForm/UploadFile";
+import { requiredFields } from "../components/RequestForm/formFields";
 
 export default function NewRequestForm() {
 
     const [currentStep, setCurrentStep] = useState(1);
     const steps: string[] = ["Basic Details", "Request Details", "Attach File", "Complete"];
 
-    const [tempData, setTempData] = useState('');
+    const [tempData, setTempData] = useState<any>('');
 
     const displayFragments = (step: number) => {
         switch (step) {
             case 1:
                 return <BasicDetails />
-            case 2:
+            case 2: 
                 return <RequestDetails />
             case 3:
                 return <UplodadFile />
@@ -27,11 +28,29 @@ export default function NewRequestForm() {
         }
     }
 
-    const handleClick = (direction: string) => {
-        let newStep = currentStep;
-        direction === 'next' ? newStep++ : newStep--;
-        newStep > 0 && newStep <= steps.length && setCurrentStep(newStep);
 
+    const validateFields = (currentStep: number): boolean => {
+        const fields = requiredFields[currentStep];
+        for (const key in fields) {
+            const fieldName = fields[key];
+            const value = tempData[fieldName];
+            if (value === null || value === undefined || value === '') {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    const handleClick = (direction: string) => {
+
+        let newStep = currentStep;
+        if(direction === '' || validateFields(currentStep)) {
+            direction === 'next' ? newStep++ : newStep--;
+            newStep > 0 && newStep <= steps.length && setCurrentStep(newStep);
+        } else {
+            window.alert('Please fill up all required fields');
+        }
+        
     }
 
     return (

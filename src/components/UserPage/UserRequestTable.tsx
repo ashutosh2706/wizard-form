@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import { dummyData } from "../../data/dummyData";
-import { createColumnHelper, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, useReactTable } from "@tanstack/react-table";
+import { SortingState, createColumnHelper, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, useReactTable } from "@tanstack/react-table";
 import { UserRequest, UserRequestAPI } from "../../types/userRequest";
 import { useNavigate } from "react-router-dom";
 import { CirclePlus, ChevronLeft, ChevronRight } from 'lucide-react';
@@ -57,6 +57,8 @@ export default function UserRequestTable() {
     ]
 
     const [requestData, setRequestData] = useState<UserRequest[]>(dummyData);
+    const [globalFilter, setGlobalFilter] = useState("");
+    const [sorting, setSorting] = useState<SortingState>([]);
 
     useEffect(() => {
         const token = getCookie('token') ?? '';
@@ -71,24 +73,23 @@ export default function UserRequestTable() {
 
             setRequestData(mappedData);
 
-        }).catch(err => console.error(err));
+        }).catch((error: Error) => window.alert(error.message));
 
     }, []);
-
-
-    const [globalFilter, setGlobalFilter] = useState("");
-
 
 
     const table = useReactTable({
         data: requestData,
         columns: defaultColumns,
         state: {
-            globalFilter
+            globalFilter,
+            sorting: sorting
         },
         getFilteredRowModel: getFilteredRowModel(),
         getCoreRowModel: getCoreRowModel(),
-        getPaginationRowModel: getPaginationRowModel()
+        getPaginationRowModel: getPaginationRowModel(),
+        getSortedRowModel: getSortedRowModel(),
+        onSortingChange: setSorting
     })
 
     table.getState().pagination.pageSize = 10;          // number of rows per page
@@ -121,8 +122,14 @@ export default function UserRequestTable() {
                                     <tr key={headerGroup.id}>
                                         {
                                             headerGroup.headers.map(header => (
-                                                <th key={header.id} className="p-3 text-md font-semibold tracking-wide text-left whitespace-nowrap">
-                                                    {flexRender(header.column.columnDef.header, header.getContext())}
+                                                <th key={header.id} className="p-3 text-md font-semibold tracking-wide text-left whitespace-nowrap" colSpan={header.colSpan}>
+                                                    {header.isPlaceholder ? null : (
+                                                        <div className={header.column.getCanSort() ? 'cursor-pointer select-none' : ''} onClick={header.column.getToggleSortingHandler()}
+                                                            title={header.column.getCanSort() ? header.column.getNextSortingOrder() === 'asc' ? 'Sort ascending' : header.column.getNextSortingOrder() === 'desc' ? 'Sort descending' : 'Clear sort' : undefined}>
+                                                            {flexRender(header.column.columnDef.header, header.getContext())}
+                                                            {{ asc: ' 🔼', desc: ' 🔽', }[header.column.getIsSorted() as string] ?? null}
+                                                        </div>
+                                                    )}
                                                 </th>
                                             ))
                                         }
@@ -138,9 +145,7 @@ export default function UserRequestTable() {
                                             {
                                                 row.getVisibleCells().map((cell) => (
                                                     <td key={cell.id} className="p-3 text-gray-700 whitespace-nowrap">
-                                                        {
-                                                            flexRender(cell.column.columnDef.cell, cell.getContext())
-                                                        }
+                                                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
                                                     </td>
                                                 ))
                                             }
