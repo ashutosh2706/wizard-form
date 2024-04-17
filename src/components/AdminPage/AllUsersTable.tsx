@@ -7,6 +7,9 @@ import ToggleSwitch from "../ToggleSwitch";
 import { getCookie } from "../../utils/cookieUtil";
 import { decodeJwt } from "../../utils/decodeJwt";
 import { userService } from "../../services/userService";
+import RoleModal from "./RoleModal";
+import Swal from "sweetalert2";
+import { SuccessToast } from "../../lib/Toast";
 
 
 export default function AllUserTable() {
@@ -35,18 +38,18 @@ export default function AllUserTable() {
         }),
         columnHelper.accessor('roleId', {
             cell: info => {
-                if(info.getValue() === 1) {
+                if (info.getValue() === 1) {
                     return (
                         <div className="flex items-center justify-start gap-2">
                             <span>User</span>
-                            <Settings className="w-5 h-5 cursor-pointer"/>
+                            <Settings className="w-5 h-5 cursor-pointer" />
                         </div>
                     )
                 } else {
                     return (
                         <div className="flex items-center justify-start gap-2">
                             <span>Admin</span>
-                            <Settings className="w-5 h-5 cursor-pointer"/>
+                            <Settings className="w-5 h-5 cursor-pointer" />
                         </div>
                     )
                 }
@@ -59,9 +62,12 @@ export default function AllUserTable() {
     const [userData, setUserData] = useState<UserModel[]>([]);
     const [globalFilter, setGlobalFilter] = useState("");
     const [renderComponent, setRenderComponent] = useState<boolean>(false);
+    const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
+    const [userId, setUserId] = useState<number>(-1);
+    const [roleId, setRoleId] = useState<number>(-1);
 
 
-    useEffect(() => {
+    const fetchData = () => {
 
         const token = getCookie('token') ?? '';
         const loggedInUserId = decodeJwt(token).UserId;
@@ -69,9 +75,17 @@ export default function AllUserTable() {
         userService.getUsers().then((data: UserModel[]) => {
             const filteredData = data.filter(e => e.userId != parseInt(loggedInUserId, 10));    // remove the user which is currently logged in
             setUserData(filteredData);
-        }).catch((error: Error) => window.alert(error.message));
+        }).catch((error: Error) => {
+            Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: `${error.message}`,
+                confirmButtonColor: '#4369ff'
+            });
+        });
+    }
 
-    }, [renderComponent]);
+    useEffect(() => fetchData(), [renderComponent]);
 
     const table = useReactTable({
         data: userData,
@@ -84,15 +98,14 @@ export default function AllUserTable() {
         getPaginationRowModel: getPaginationRowModel()
     })
 
-    table.getState().pagination.pageSize = 10;          // -> number of rows per page
+    table.getState().pagination.pageSize = 10;
 
 
     const handleRoleChange = (userId: unknown, roleId: unknown) => {
-        if(typeof userId === 'number' && typeof roleId === 'number') {
-            const newRoleId = roleId === 1 ? 2 : 1;
-            userService.changeRole(userId, newRoleId).then(() => {
-                setRenderComponent(!renderComponent);   // better to open a modal dialog
-            }).catch((error: Error) => window.alert(error.message));
+        if (typeof userId === 'number' && typeof roleId === 'number') {
+            setUserId(userId);
+            setRoleId(roleId);
+            setIsModalVisible(true);    // open modal
         }
     }
 
@@ -100,7 +113,7 @@ export default function AllUserTable() {
     const handleUserStatus = (userId: unknown, status: unknown) => {
 
         /**
-         * ==> sync the update of status with api
+         * => sync the update of status with api
          */
 
         if (status === 'allowed') {
@@ -123,7 +136,18 @@ export default function AllUserTable() {
             });
         }
 
-        userService.allowUser(userId).then().catch((error: Error) => window.alert(error.message));
+        userService.allowUser(userId).then(() => {
+            SuccessToast.fire({
+                title: "Action completed successfully"
+            });
+        }).catch((error: Error) => {
+            Swal.fire({
+                icon: "error",
+                title: "Changes not saved",
+                text: `${error.message}`,
+                confirmButtonColor: '#4369ff'
+            });
+        });
     }
 
 
@@ -131,20 +155,20 @@ export default function AllUserTable() {
         <>
             <div className="p-5 bg-gray-100 h-screen">
                 <div className="flex justify-between mb-5 me-5">
-                    <div className="text-md w-auto">
+                    <div className="text-base w-auto">
                         <TableSearch debounce={500} initValue={globalFilter ?? ""} onChange={(value) => setGlobalFilter(String(value))} />
                     </div>
                 </div>
                 <div className="overflow-auto rounded-lg shadow-xl border border-gray-400">
                     <table className="shadow-lg w-full rounded-xl overflow-hidden">
-                        <caption className="text-start text-xl p-5 font-medium" >Account Requests</caption>
+                        <caption className="text-start md:text-xl text-base p-5 font-medium">Account Requests</caption>
                         <thead className="bg-white border-b-2 border-gray-200">
                             {
                                 table.getHeaderGroups().map((headerGroup) => (
                                     <tr key={headerGroup.id}>
                                         {
                                             headerGroup.headers.map(header => (
-                                                <th key={header.id} className="p-3 text-md font-semibold tracking-wide text-left whitespace-nowrap">
+                                                <th key={header.id} className="p-3 md:text-base text-sm font-semibold tracking-wide text-left whitespace-nowrap">
                                                     {flexRender(header.column.columnDef.header, header.getContext())}
                                                 </th>
                                             ))
@@ -160,13 +184,13 @@ export default function AllUserTable() {
                                         <tr key={row.id} className={`${index % 2 == 0 ? 'bg-white' : 'bg-gray-100'} hover:bg-slate-200 transition-all duration-100`}>
                                             {
                                                 row.getVisibleCells().map((cell) => (
-                                                    <td key={cell.id} className="p-3 text-gray-700 whitespace-nowrap" onClick={() => {
+                                                    <td key={cell.id} className="p-3 md:text-base text-sm text-gray-700 whitespace-nowrap" onClick={() => {
                                                         if (cell.column.id === 'isAllowed') {
                                                             const row = cell.row;
                                                             const userId = row.getAllCells().find(c => c.column.id === 'userId')?.getValue();
                                                             const status = row.getAllCells().find(c => c.column.id === 'isAllowed')?.getValue();
                                                             handleUserStatus(userId, status);
-                                                        } else if(cell.column.id === 'roleId') {
+                                                        } else if (cell.column.id === 'roleId') {
                                                             const row = cell.row;
                                                             const userId = row.getAllCells().find(c => c.column.id === 'userId')?.getValue();
                                                             const roleId = row.getAllCells().find(c => c.column.id === 'roleId')?.getValue();
@@ -179,7 +203,7 @@ export default function AllUserTable() {
                                             }
                                         </tr>
                                     ))
-                                ) : (<tr><td className="text-red-600 font-medium p-5 items-center justify-center text-xl">No record found!</td></tr>)
+                                ) : (<tr><td className="text-red-600 font-medium p-5 items-center justify-center md:text-xl text-sm">No record found!</td></tr>)
                             }
                         </tbody>
                     </table>
@@ -211,6 +235,7 @@ export default function AllUserTable() {
                 </div>
 
             </div>
+            <RoleModal isModalVisible={isModalVisible} onClose={() => setIsModalVisible(!isModalVisible)} reRenderComponent={() => setRenderComponent(!renderComponent)} userId={userId} roleId={roleId} />
         </>
     )
 }

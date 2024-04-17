@@ -4,15 +4,15 @@ import UserPage from "../components/UserPage";
 
 
 interface HomepageProps {
-    role: string | undefined,
-    setLoggedIn: React.Dispatch<React.SetStateAction<boolean>>;
+    role: string | undefined;
+    logout: () => void;
 }
 
-export default function Homepage({ role, setLoggedIn }: HomepageProps) {
+export default function Homepage({ role, logout }: HomepageProps) {
 
     return (
         <>
-            <Navbar setLoggedIn={setLoggedIn} />
+            <Navbar logout={logout} />
             {role === 'admin' && (<AdminPage />)}
             {role === 'user' && (<UserPage />)}
         </>

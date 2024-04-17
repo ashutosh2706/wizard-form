@@ -21,8 +21,8 @@ export default function ToggleSwitch({ switchState }: ToggleSwitchProps) {
                         onChange={() => setIsChecked(!isChecked)}
                     />
                     <span
-                        className={`w-2/5 h-4/5 bg-red-600 absolute rounded-full left-0.5 top-0.5 peer-checked:bg-green-600 peer-checked:left-5 ${isChecked ? 'peer-checked' : ''}`}
-                    ></span>
+                        className={`w-2/5 h-4/5 bg-red-600 absolute rounded-full left-0.5 top-0.5 peer-checked:bg-green-600 peer-checked:left-5 ${isChecked ? 'peer-checked' : ''}`}>
+                    </span>
                 </label>
             </div>
         </>

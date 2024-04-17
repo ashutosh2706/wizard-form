@@ -3,20 +3,35 @@ import { useState } from "react";
 import { deleteCookie, getCookie } from "../utils/cookieUtil";
 import { decodeJwt } from "../utils/decodeJwt";
 import { Menu } from "lucide-react";
+import Swal from "sweetalert2";
+
 
 interface NavbarProps {
-    setLoggedIn: React.Dispatch<React.SetStateAction<boolean>>
+    logout: () => void
 }
 
-export default function Navbar({ setLoggedIn }: NavbarProps) {
+export default function Navbar({ logout }: NavbarProps) {
 
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [isMenuExpanded, setMenuExpanded] = useState(false);
 
     function handleLogout() {
-        deleteCookie('token');
-        deleteCookie('role');
-        setLoggedIn(false);
+
+        Swal.fire({
+            title: "Confirm",
+            text: "Are you sure you want to logout ?",
+            icon: "question",
+            showCancelButton: true,
+            confirmButtonColor: "#4369ff",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Logout"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                deleteCookie('token');
+                deleteCookie('role');
+                logout();
+            }
+        });
     }
 
     const fullName = (): string => {
@@ -71,10 +86,10 @@ export default function Navbar({ setLoggedIn }: NavbarProps) {
                                 </button>
                             </div>
                         )}
+
                     </div>
                 </div>
             </nav>
         </>
     )
-
 }

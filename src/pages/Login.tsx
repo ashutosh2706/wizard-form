@@ -4,40 +4,55 @@ import Homepage from "./Homepage";
 import { getCookie, setCookie } from "../utils/cookieUtil";
 import { decodeJwt } from "../utils/decodeJwt";
 import authService from "../services/authService";
+import Swal from "sweetalert2";
+import useLoginState from "../hooks/useLoginState";
 
 export default function Login() {
 
     const navigate = useNavigate();
-    const [loggedIn, setLoggedIn] = useState<boolean>(false);
+    const { isLoggedIn, login, logout } = useLoginState();
     const [role, setRole] = useState<string>();
 
 
     useEffect(() => {
         const token: string | undefined = getCookie("token");
-        const role: string | undefined = getCookie("role");
-        if(role && token) {
+        if (token) {
+            const role = decodeJwt(token).RoleType;
             setRole(role);
-            setLoggedIn(true);
+            login();
         }
-
-    }, [])
+    }, []);
 
 
     function loginUser(email: string, password: string) {
 
+        Swal.fire({
+            text: "Logging you in, please wait",
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
         authService.login(email, password).then((data) => {
             const role = decodeJwt(data).RoleType;
             setCookie('token', data);
-            setCookie('role', role);
             setRole(role);
-            setLoggedIn(true);
-        }).catch((error: Error) => window.alert(error.message)); 
-        
+            Swal.close();
+            login();
+        }).catch((error: Error) => {
+            Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: `${error.message}`,
+                confirmButtonColor: '#4369ff'
+            });
+        });
+
     }
 
 
 
-    if(!loggedIn) {
+    if (!isLoggedIn) {
         return (
             <>
                 <section className="bg-gray-50 min-h-screen flex items-center justify-center">
@@ -56,21 +71,21 @@ export default function Login() {
                                 <input className="p-2 rounded-xl border" type="password" name="password" placeholder="Password" required />
                                 <button className="bg-[#4369ff] rounded-xl text-white py-2 font-medium hover:bg-[#3451c7]" type="submit">Login</button>
                             </form>
-    
+
                             <div className="mt-10 grid grid-cols-3 items-center text-gray-500">
                                 <hr className="border-gray-500" />
                                 <p className="text-center">OR</p>
                                 <hr className="border-gray-500" />
-    
+
                             </div>
                             <p className="text-center mt-5 text-black">Don't have account ? <span className="text-blue-700 font-semibold hover:underline cursor-pointer" onClick={() => navigate("/register")}>Register</span></p>
-                            
+
                         </div>
                     </div>
                 </section>
             </>
         )
     } else {
-        return (<Homepage role={role} setLoggedIn={setLoggedIn}/>)
+        return (<Homepage role={role} logout={logout} />)
     }
 }

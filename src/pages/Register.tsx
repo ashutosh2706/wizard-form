@@ -1,6 +1,8 @@
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import authService from "../services/authService";
+import Swal from "sweetalert2";
+import { SuccessToast } from "../lib/Toast";
 
 
 export default function Register() {
@@ -16,9 +18,19 @@ export default function Register() {
 
         const roleId: number = adminRole ? 2 : 1;
         authService.register(firstname, lastname, email, password, roleId).then(() => {
-            window.alert('Registered Successfully');
+            SuccessToast.fire({
+                icon: "success",
+                title: "Registered successfully"
+            });
             navigate("/");
-        }).catch((error: Error) => window.alert(error.message));
+        }).catch((error: Error) => {
+            Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: `${error.message}`,
+                confirmButtonColor: '#4369ff'
+            });
+        });
     }
 
     return (
@@ -38,7 +50,7 @@ export default function Register() {
                             <input className="p-2 rounded-xl border" type="email" name="email" placeholder="Email" required />
                             <input className="p-2 rounded-xl border" type="password" name="password" placeholder="Password" required />
                             <div className="flex items-center mt-4">
-                                <input type="checkbox" id="rememberMe" checked={adminRole} onChange={(e) => setAdminRole(e.target.checked)} className="rounded text-[#4369ff] focus:ring-[#4369ff] border-gray-300"/>
+                                <input type="checkbox" id="rememberMe" checked={adminRole} onChange={(e) => setAdminRole(e.target.checked)} className="rounded text-[#4369ff] focus:ring-[#4369ff] border-gray-300" />
                                 <label htmlFor="adminchoice" className="ml-2 text-gray-700">Admin account</label>
                             </div>
                             <button className="bg-[#4369ff] rounded-xl text-white py-2 font-medium hover:bg-[#3451c7]" type="submit">Register</button>

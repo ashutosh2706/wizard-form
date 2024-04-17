@@ -6,6 +6,10 @@ interface Field {
     [key: number]: FieldDefinition;
 }
 
+/**
+ * These are required fields for form-validation
+ */
+
 export const requiredFields: Field = {
     1: {
         'email': 'email',
@@ -15,5 +19,4 @@ export const requiredFields: Field = {
         'request-title': 'request-title',
         'request-priority': 'request-priority',
     }
-    // add fields for further steps
 };

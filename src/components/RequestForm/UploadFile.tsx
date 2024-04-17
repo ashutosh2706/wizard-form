@@ -40,24 +40,24 @@ export default function UplodadFile() {
     return (
         <>
             <div className="flex flex-col">
-                <div className="max-w-3xl px-20">
-                    <h2 className="font-medium underline text-2xl text-center mb-10 font-sans">Attach File</h2>
+                <div className="max-w-3xl md:px-20 px-10">
+                    <h2 className="font-medium underline md:text-2xl text-lg text-center mb-10 font-sans">Attach File</h2>
                     <div className="flex flex-col gap-4">
-                        <div className="font-bold h-6 mt-3 text-sm leading-8 uppercase"> Attach file <span className="text-xs font-normal">(pdf/doc/jpeg)</span> <span className="text-red-600 font-bold text-lg">*</span></div>
+                        <div className="md:font-bold font-medium h-6 mt-3 md:text-sm text-xs leading-8 uppercase"> Attach file <span className="text-xs font-normal">(pdf/doc/jpeg)</span> <span className="text-red-600 font-bold text-lg"></span></div>
                         <div className="flex items-center justify-center border-dotted border-black border-2 w-full" onDragOver={handleDragOver} onDrop={handleDrop}>
                             <div className="flex flex-col items-center justify-center p-5 mb-5">
                                 {!isFileSelected && (
                                     <div className="flex flex-col items-center justify-center">
                                         <Files className="w-16 h-16 m-5 hidden md:block" />
-                                        <span className="text-xl">Drag and Drop File</span>
-                                        <span className="m-3 text-xl">or</span>
+                                        <span className="md:text-xl text-sm">Drag and Drop File</span>
+                                        <span className="m-3 md:text-xl text-sm">or</span>
                                     </div>
                                 )}
                                 {isFileSelected && (
-                                    <span className="text-xl m-5">{tempData['file-name']}</span>
+                                    <span className="md:text-xl text-sm m-5">{tempData['file-name']}</span>
                                 )}
-                                <input onChange={handleFileChange} type="file" name="file-upload" hidden accept=".pdf, .doc, .docx, .jpeg" ref={inputFile} />
-                                <button className="bg-gray-700 text-white py-2 px-4 rounded-xl font-semibold cursor-pointer tracking-wide hover:bg-gray-300 hover:text-black transition duration-200 ease-in-out" onClick={() => inputFile.current?.click()}>Select File</button>
+                                <input onChange={handleFileChange} type="file" name="file-upload" hidden accept=".pdf, .doc, .docx, .jpeg, .jpg" ref={inputFile} />
+                                <button className="bg-gray-700 text-white py-2 px-4 md:text-base text-sm rounded-xl md:font-semibold font-medium cursor-pointer tracking-wide hover:bg-gray-300 hover:text-black transition duration-200 ease-in-out" onClick={() => inputFile.current?.click()}>Select File</button>
                             </div>
                         </div>
                     </div>

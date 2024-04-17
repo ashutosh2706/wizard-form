@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { StepperContext } from "../contexts/stepperContext";
 import Stepper from "../components/RequestForm/Stepper";
 import StepperControl from "../components/RequestForm/StepperControl";
@@ -7,6 +7,11 @@ import SubmitForm from "../components/RequestForm/SubmitForm";
 import BasicDetails from "../components/RequestForm/BasicDetails";
 import UplodadFile from "../components/RequestForm/UploadFile";
 import { requiredFields } from "../components/RequestForm/formFields";
+import { useNavigate } from "react-router-dom";
+import { getCookie } from "../utils/cookieUtil";
+import { decodeJwt } from "../utils/decodeJwt";
+import { ErrorToast } from "../lib/Toast";
+
 
 export default function NewRequestForm() {
 
@@ -14,6 +19,15 @@ export default function NewRequestForm() {
     const steps: string[] = ["Basic Details", "Request Details", "Attach File", "Complete"];
 
     const [tempData, setTempData] = useState<any>('');
+
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        const token: string | undefined = getCookie("token");
+        if(token === null || token === undefined || decodeJwt(token).RoleType === 'admin') {
+            navigate("/");
+        }
+    }, []);
 
     const displayFragments = (step: number) => {
         switch (step) {
@@ -48,7 +62,9 @@ export default function NewRequestForm() {
             direction === 'next' ? newStep++ : newStep--;
             newStep > 0 && newStep <= steps.length && setCurrentStep(newStep);
         } else {
-            window.alert('Please fill up all required fields');
+            ErrorToast.fire({
+                title: "Required fields can't be empty."
+            });
         }
         
     }
@@ -60,7 +76,6 @@ export default function NewRequestForm() {
                     <div className="container mt-5 mb-5">
                         <Stepper steps={steps} currentStep={currentStep} />
                     </div>
-
                     <div className="flex justify-center mt-10 mb-5">
                     <div className="w-4/5 py-12 shadow-lg bg-gray-100 rounded-3xl border-2 border-gray-300">
                         <StepperContext.Provider value={{ tempData, setTempData }}>

@@ -71,12 +71,12 @@ export default function Stepper({ steps, currentStep }: StepperProps) {
             <div key={index} className={index !== newSteps.length - 1 ? "w-full flex items-center" : "flex items-center"}>
                 <div className="relative flex flex-col items-center text-gray-900">
                     <div className={`rounded-full transition duration-500 ease-in-out
-                 h-12 w-12 flex items-center justify-center py-3 ${step.selected ? "text-black font-bold text-lg border-2 border-[#4369ff]" : "border-2 border-gray-300"} ${step.completed ? 'bg-[#4369ff] text-white font-bold border border-[#4369ff]' : ''}`}>
+                    md:h-12 md:w-12 h-9 w-9 flex items-center justify-center py-3 ${step.selected ? "text-black font-bold text-lg border-2 border-[#4369ff]" : "border-2 border-gray-300"} ${step.completed ? 'bg-[#4369ff] text-white font-bold border border-[#4369ff]' : ''}`}>
                         {
                             step.completed ? <span className="text-white font-bold text-xl">&#10003;</span> : <span className="font-medium">{index + 1}</span>
                         }
                     </div>
-                    <div className={`absolute top-0 text-center mt-16 w-32 text-xs uppercase 
+                    <div className={`absolute top-0 text-center mt-16 w-32 text-sm hidden  uppercase md:block
                     ${step.selected ? "text-gray-900 font-bold" : "text-gray-400 font-medium"}`}>
                         {step.description}
                     </div>

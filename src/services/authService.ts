@@ -12,8 +12,8 @@ const authService = {
             return response.data;
         } catch (error) {
             if(error instanceof AxiosError) {
-                if(error.response?.status === 400) throw new Error(`${error.response.status}: Account has not been activated`);
-                else throw new Error(`${error.response?.status}: ${error.response?.data}`);
+                if(error.response?.status === 400) throw new Error("Account has not been activated");
+                else throw new Error("500: Internal Server Error");
             } else {
                 throw new Error("An error occurred while logging in.");
             }

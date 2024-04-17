@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react"
-import { dummyData } from "../../data/dummyData";
 import { SortingState, createColumnHelper, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, useReactTable } from "@tanstack/react-table";
 import { UserRequest, UserRequestAPI } from "../../types/userRequest";
 import { useNavigate } from "react-router-dom";
@@ -8,6 +7,7 @@ import { getCookie } from "../../utils/cookieUtil";
 import { decodeJwt } from "../../utils/decodeJwt";
 import TableSearch from "../TableSearch";
 import { requestService } from "../../services/requestService";
+import Swal from "sweetalert2";
 
 
 export default function UserRequestTable() {
@@ -56,7 +56,7 @@ export default function UserRequestTable() {
 
     ]
 
-    const [requestData, setRequestData] = useState<UserRequest[]>(dummyData);
+    const [requestData, setRequestData] = useState<UserRequest[]>([]);
     const [globalFilter, setGlobalFilter] = useState("");
     const [sorting, setSorting] = useState<SortingState>([]);
 
@@ -73,7 +73,14 @@ export default function UserRequestTable() {
 
             setRequestData(mappedData);
 
-        }).catch((error: Error) => window.alert(error.message));
+        }).catch((error: Error) => {
+            Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: `${error.message}`,
+                confirmButtonColor: '#4369ff'
+            });
+        });
 
     }, []);
 
@@ -98,7 +105,7 @@ export default function UserRequestTable() {
         <>
             <div className="p-5 bg-gray-100 h-screen">
                 <div className="flex justify-between mb-5 me-5">
-                    <div className="text-md w-auto">
+                    <div className="text-base w-auto">
                         <TableSearch debounce={500} initValue={globalFilter ?? ""} onChange={(value) => setGlobalFilter(String(value))} />
                     </div>
                     <div className="text-xl">
@@ -115,14 +122,14 @@ export default function UserRequestTable() {
                 </div>
                 <div className="overflow-auto rounded-lg shadow-xl border border-gray-400">
                     <table className="shadow-lg w-full rounded-xl overflow-hidden">
-                        <caption className="text-start text-xl p-5 font-medium" >My Requests</caption>
+                        <caption className="text-start md:text-xl text-base p-5 font-medium" >My Requests</caption>
                         <thead className="bg-white border-b-2 border-gray-200">
                             {
                                 table.getHeaderGroups().map((headerGroup) => (
                                     <tr key={headerGroup.id}>
                                         {
                                             headerGroup.headers.map(header => (
-                                                <th key={header.id} className="p-3 text-md font-semibold tracking-wide text-left whitespace-nowrap" colSpan={header.colSpan}>
+                                                <th key={header.id} className="p-3 md:text-base text-sm font-semibold tracking-wide text-left whitespace-nowrap" colSpan={header.colSpan}>
                                                     {header.isPlaceholder ? null : (
                                                         <div className={header.column.getCanSort() ? 'cursor-pointer select-none' : ''} onClick={header.column.getToggleSortingHandler()}
                                                             title={header.column.getCanSort() ? header.column.getNextSortingOrder() === 'asc' ? 'Sort ascending' : header.column.getNextSortingOrder() === 'desc' ? 'Sort descending' : 'Clear sort' : undefined}>
@@ -144,14 +151,14 @@ export default function UserRequestTable() {
                                         <tr key={row.id} className={`${index % 2 == 0 ? 'bg-white' : 'bg-gray-100'} hover:bg-slate-200 transition-all duration-100`}>
                                             {
                                                 row.getVisibleCells().map((cell) => (
-                                                    <td key={cell.id} className="p-3 text-gray-700 whitespace-nowrap">
+                                                    <td key={cell.id} className="p-3 md:text-base text-sm text-gray-700 whitespace-nowrap">
                                                         {flexRender(cell.column.columnDef.cell, cell.getContext())}
                                                     </td>
                                                 ))
                                             }
                                         </tr>
                                     ))
-                                ) : (<tr><td className="text-red-600 font-medium p-5 items-center justify-center text-xl">No record found!</td></tr>)
+                                ) : (<tr><td className="text-red-600 font-medium p-5 items-center justify-center md:text-xl text-sm">No record found!</td></tr>)
                             }
                         </tbody>
                     </table>

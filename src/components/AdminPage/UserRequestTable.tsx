@@ -3,16 +3,14 @@ import { UserRequestAdmin } from "../../types/userRequestAdmin";
 import { useEffect, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import TableSearch from "../TableSearch"
-import ModalDialog from "./ModalDialog";
 import { UserRequestAPI } from "../../types/userRequest";
 import { requestService } from "../../services/requestService";
+import Swal from "sweetalert2";
 
 
 export default function UserRequestTable() {
 
     const [renderComponent, setRenderComponent] = useState<boolean>(false);
-    const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
-    const [requestId, setRequestId] = useState<number | unknown>();
     const [userRequestData, setUserRequestData] = useState<UserRequestAdmin[]>([]);
     const [globalFilter, setGlobalFilter] = useState("");
     const [sorting, setSorting] = useState<SortingState>([]);
@@ -32,10 +30,51 @@ export default function UserRequestTable() {
 
             setUserRequestData(mappedData);
 
-        }).catch((error: Error) => window.alert(error.message));
+        }).catch((error: Error) => {
+            Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: `${error.message}`,
+                confirmButtonColor: '#4369ff'
+            });
+        });
     }
 
     useEffect(() => fetchData(), [renderComponent]);
+
+
+    const handleRequest = (requestId: number | unknown) => {
+        if (typeof requestId === 'number') {
+            Swal.fire({
+                title: "Confirm Request Action",
+                icon: "question",
+                showDenyButton: true,
+                confirmButtonColor: "#3085d6",
+                confirmButtonText: "Approve",
+                denyButtonText: "Reject"
+            }).then((result) => {
+                if (!result.isDismissed && (result.isConfirmed || result.isDenied)) {
+                    const statusCode = result.isConfirmed ? 2 : 3;
+                    requestService.updateRequestStatus(requestId, statusCode).then(() => {
+                        setRenderComponent(!renderComponent);
+                        Swal.fire({
+                            title: "Success",
+                            text: `Request ${result.isConfirmed ? 'approved' : 'rejected'}`,
+                            icon: "success"
+                        });
+                    }).catch((error: Error) => {
+                        Swal.fire({
+                            icon: "error",
+                            title: "Error",
+                            text: `${error.message}`,
+                            confirmButtonColor: '#4369ff'
+                        });
+                    });
+                }
+            });
+        }
+    }
+
 
     const columnHelper = createColumnHelper<UserRequestAdmin>();
 
@@ -105,20 +144,20 @@ export default function UserRequestTable() {
         <>
             <div className="p-5 bg-gray-100 h-screen">
                 <div className="flex justify-between mb-5 me-5">
-                    <div className="text-md w-auto">
+                    <div className="text-base w-auto">
                         <TableSearch debounce={500} initValue={globalFilter ?? ""} onChange={(value) => setGlobalFilter(String(value))} />
                     </div>
                 </div>
                 <div className="overflow-auto rounded-lg shadow-xl border border-gray-400">
                     <table className="shadow-lg w-full rounded-xl overflow-hidden">
-                        <caption className="text-start text-xl p-5 font-medium" >User Requests</caption>
+                        <caption className="text-start md:text-xl text-base p-5 font-medium">User Requests</caption>
                         <thead className="bg-white border-b-2 border-gray-200">
                             {
                                 table.getHeaderGroups().map((headerGroup) => (
                                     <tr key={headerGroup.id}>
                                         {
                                             headerGroup.headers.map(header => (
-                                                <th key={header.id} className="p-3 text-md font-semibold tracking-wide text-left whitespace-nowrap" colSpan={header.colSpan}>
+                                                <th key={header.id} className="p-3 md:text-base text-sm font-semibold tracking-wide text-left whitespace-nowrap" colSpan={header.colSpan}>
                                                     {header.isPlaceholder ? null : (
                                                         <div className={header.column.getCanSort() ? 'cursor-pointer select-none' : ''} onClick={header.column.getToggleSortingHandler()}
                                                             title={header.column.getCanSort() ? header.column.getNextSortingOrder() === 'asc' ? 'Sort ascending' : header.column.getNextSortingOrder() === 'desc' ? 'Sort descending' : 'Clear sort' : undefined}>
@@ -141,21 +180,21 @@ export default function UserRequestTable() {
                                             onClick={() => {
                                                 row.getAllCells().forEach(cell => {
                                                     if (cell.column.id === 'requestId') {
-                                                        setRequestId(cell.getValue());
+                                                        handleRequest(cell.getValue());
                                                     }
                                                 })
-                                                setIsModalVisible(!isModalVisible);
+                                                
                                             }}>
                                             {
                                                 row.getVisibleCells().map((cell) => (
-                                                    <td key={cell.id} className="p-3 text-gray-700 whitespace-nowrap">
+                                                    <td key={cell.id} className="p-3 md:text-base text-sm text-gray-700 whitespace-nowrap">
                                                         {flexRender(cell.column.columnDef.cell, cell.getContext())}
                                                     </td>
                                                 ))
                                             }
                                         </tr>
                                     ))
-                                ) : (<tr><td className="text-red-600 font-medium p-5 items-center justify-center text-xl">No record found!</td></tr>)
+                                ) : (<tr><td className="text-red-600 font-medium p-5 items-center justify-center md:text-xl text-sm">No record found!</td></tr>)
                             }
                         </tbody>
                     </table>
@@ -185,10 +224,7 @@ export default function UserRequestTable() {
                             }} />
                     </span>
                 </div>
-
             </div>
-            {/* Modal Dialog */}
-            <ModalDialog requestId={requestId} isModalVisible={isModalVisible} reRenderComponent={() => setRenderComponent(!renderComponent)} onClose={() => setIsModalVisible(!isModalVisible)} />
         </>
     )
 }

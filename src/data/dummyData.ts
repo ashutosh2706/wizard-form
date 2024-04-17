@@ -127,104 +127,119 @@ export const dummyUsers: UserModel[] = [
         firstName: 'Michael',
         lastName: 'Townley',
         email: 'Michael@gmail.com',
-        isAllowed: "allowed"
+        isAllowed: "allowed",
+        roleId: -1
     },
     {
         userId: 102,
         firstName: 'Franklin',
         lastName: 'Clinton',
         email: 'Franklin@gmail.com',
-        isAllowed: "restricted"
+        isAllowed: "restricted",
+        roleId: -1
     },
     {
         userId: 103,
         firstName: 'Trevor',
         lastName: 'Philips',
         email: 'Trevor@gmail.com',
-        isAllowed: "allowed"
+        isAllowed: "allowed",
+        roleId: -1
     },
     {
         userId: 101,
         firstName: 'Michael',
         lastName: 'Townley',
         email: 'Michael@gmail.com',
-        isAllowed: "allowed"
+        isAllowed: "allowed",
+        roleId: -1
     },
     {
         userId: 102,
         firstName: 'Franklin',
         lastName: 'Clinton',
         email: 'Franklin@gmail.com',
-        isAllowed: "restricted"
+        isAllowed: "restricted",
+        roleId: -1
     },
     {
         userId: 103,
         firstName: 'Trevor',
         lastName: 'Philips',
         email: 'Trevor@gmail.com',
-        isAllowed: "allowed"
+        isAllowed: "allowed",
+        roleId: -1
     },
     {
         userId: 101,
         firstName: 'Michael',
         lastName: 'Townley',
         email: 'Michael@gmail.com',
-        isAllowed: "allowed"
+        isAllowed: "allowed",
+        roleId: -1
     },
     {
         userId: 102,
         firstName: 'Franklin',
         lastName: 'Clinton',
         email: 'Franklin@gmail.com',
-        isAllowed: "restricted"
+        isAllowed: "restricted",
+        roleId: -1
     },
     {
         userId: 103,
         firstName: 'Trevor',
         lastName: 'Philips',
         email: 'Trevor@gmail.com',
-        isAllowed: "allowed"
+        isAllowed: "allowed",
+        roleId: -1
     },
     {
         userId: 101,
         firstName: 'Michael',
         lastName: 'Townley',
         email: 'Michael@gmail.com',
-        isAllowed: "allowed"
+        isAllowed: "allowed",
+        roleId: -1
     },
     {
         userId: 102,
         firstName: 'Franklin',
         lastName: 'Clinton',
         email: 'Franklin@gmail.com',
-        isAllowed: "restricted"
+        isAllowed: "restricted",
+        roleId: -1
     },
     {
         userId: 103,
         firstName: 'Trevor',
         lastName: 'Philips',
         email: 'Trevor@gmail.com',
-        isAllowed: "allowed"
+        isAllowed: "allowed",
+        roleId: -1
     },
     {
         userId: 101,
         firstName: 'Michael',
         lastName: 'Townley',
         email: 'Michael@gmail.com',
-        isAllowed: "allowed"
+        isAllowed: "allowed",
+        roleId: -1
     },
     {
         userId: 102,
         firstName: 'Franklin',
         lastName: 'Clinton',
         email: 'Franklin@gmail.com',
-        isAllowed: "restricted"
+        isAllowed: "restricted",
+        roleId: -1
     },
     {
         userId: 103,
         firstName: 'Trevor',
         lastName: 'Philips',
         email: 'Trevor@gmail.com',
-        isAllowed: "allowed"
+        isAllowed: "allowed",
+        roleId: -1
     }
 ]
