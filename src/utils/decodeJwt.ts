@@ -1,4 +1,4 @@
-import { JwtPayload } from "../types/JwtPayload";
+import { JwtPayload } from "../types/jwtPayload";
 
 export const decodeJwt = (token: string): JwtPayload => {
     const base64Url = token.split('.')[1];

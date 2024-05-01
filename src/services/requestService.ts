@@ -1,23 +1,30 @@
 import { AxiosInstance } from "axios";
 import apiConfig from "../api/apiConfig";
 import { UserRequestAPI } from "../types/userRequest";
+import { constructQuery } from "../utils/apiUtil";
 
 const api: AxiosInstance = apiConfig();
 
 export const requestService = {
 
-    getUserRequests: async(userId: number, query:string, page: number, limit: number) => {
+    getUserRequests: async(userId: number, searchTerm: string, pageNumber: number, pageSize: number) => {
+
+        const queryString = constructQuery(pageNumber, pageSize, searchTerm);
+
         try {
-            const response = await api.get(`Requests/user/${userId}?page=${page}&limit=${limit}&query=${query}`);
+            const response = await api.get(`Requests/user/${userId}?${queryString}`);
             return response.data;
         } catch (error) {
             throw new Error("An error occurred while fetching requests");
         }
     },
 
-    getUserRequestsAdmin: async(query: string, page: number, limit: number) => {
+    getAllRequests: async(searchTerm: string, pageNumber: number, pageSize: number) => {
+
+        const queryString = constructQuery(pageNumber, pageSize, searchTerm);
+
         try {
-            const response = await api.get(`Requests/?page=${page}&limit=${limit}&query=${query}`);
+            const response = await api.get(`Requests/?${queryString}`);
             return response.data;
         } catch (error) {
             throw new Error("An error occurred while fetching requests");

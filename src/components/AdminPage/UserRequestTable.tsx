@@ -26,11 +26,11 @@ export default function UserRequestTable() {
         const pageNumber: number = table.getState().pagination.pageIndex + 1;
         const pageSize: number = table.getState().pagination.pageSize;
 
-        requestService.getUserRequestsAdmin(globalFilter.trim(), pageNumber, pageSize).then((data) => {
+        requestService.getAllRequests(globalFilter.trim(), pageNumber, pageSize).then((data) => {
 
-            setTotalPage(data.total);
+            setTotalPage(data.totalPage);
             
-            const mappedData: UserRequestAdmin[] = data.requests.map((item: UserRequestAPI) => ({
+            const mappedData: UserRequestAdmin[] = data.items.map((item: UserRequestAPI) => ({
                 requestId: item.requestId,
                 userId: item.userId,
                 title: item.title,

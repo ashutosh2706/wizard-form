@@ -86,9 +86,9 @@ export default function AllUserTable() {
 
         userService.getUsers(globalFilter.trim(), pageNumber, pageSize).then((data) => {
 
-            setTotalPage(data.total);
-            const users: UserModel[] = data.users;
-            const filteredData = users.filter(e => e.userId != Number(loggedInUserId));    // remove the user which is currently logged in
+            setTotalPage(data.totalPage);
+            const users: UserModel[] = data.items;
+            const filteredData = users.filter(e => e.userId != Number(loggedInUserId));    // remove the currently logged in user
             setUserData(filteredData);
             setIsLoading(false);
             

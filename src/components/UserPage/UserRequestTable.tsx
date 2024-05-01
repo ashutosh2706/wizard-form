@@ -73,8 +73,10 @@ export default function UserRequestTable() {
         const pageSize: number = table.getState().pagination.pageSize;
 
         requestService.getUserRequests(parseInt(userId, 10), globalFilter.trim(), pageNumber, pageSize).then((data) => {
-            setTotalPage(data.total);
-            const mappedData: UserRequest[] = data.requests.map((item: UserRequestAPI) => ({
+
+            setTotalPage(data.totalPage);
+            
+            const mappedData: UserRequest[] = data.items.map((item: UserRequestAPI) => ({
                 requestId: item.requestId,
                 requestDate: item.requestDate,
                 requestTitle: item.title,
