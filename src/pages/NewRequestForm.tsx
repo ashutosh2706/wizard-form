@@ -10,13 +10,13 @@ import { requiredFields } from "../components/RequestForm/formFields";
 import { useNavigate } from "react-router-dom";
 import { getCookie } from "../utils/cookieUtil";
 import { decodeJwt } from "../utils/decodeJwt";
-import { ErrorToast } from "../lib/Toast";
-
+import { message } from "antd";
 
 export default function NewRequestForm() {
 
     const [currentStep, setCurrentStep] = useState(1);
     const steps: string[] = ["Basic Details", "Request Details", "Attach File", "Complete"];
+    const [messageApi, contextHolder] = message.useMessage();
 
     const [tempData, setTempData] = useState<any>('');
 
@@ -24,8 +24,8 @@ export default function NewRequestForm() {
 
     useEffect(() => {
         const token: string | undefined = getCookie("token");
-        if(token === null || token === undefined || decodeJwt(token).RoleType === 'admin') {
-            navigate("/");
+        if (token === null || token === undefined || decodeJwt(token).RoleType === 'admin') {
+            navigate("/403");
         }
     }, []);
 
@@ -33,7 +33,7 @@ export default function NewRequestForm() {
         switch (step) {
             case 1:
                 return <BasicDetails />
-            case 2: 
+            case 2:
                 return <RequestDetails />
             case 3:
                 return <UplodadFile />
@@ -58,30 +58,32 @@ export default function NewRequestForm() {
     const handleClick = (direction: string) => {
 
         let newStep = currentStep;
-        if(direction === '' || validateFields(currentStep)) {
+        if (direction === '' || validateFields(currentStep)) {
             direction === 'next' ? newStep++ : newStep--;
             newStep > 0 && newStep <= steps.length && setCurrentStep(newStep);
         } else {
-            ErrorToast.fire({
-                title: "Required fields can't be empty."
+            messageApi.open({
+                type: 'error',
+                content: `Required fields can't be Empty`,
             });
         }
-        
+
     }
 
     return (
         <>
+            {contextHolder}
             <div className="h-screen flex justify-center items-center bg-gray-50">
                 <div className="md:w-1/2 w-full mx-auto rounded-2xl pb-2 bg-gray-50 border-gray-400 flex flex-col h-screen">
                     <div className="container mt-5 mb-5">
                         <Stepper steps={steps} currentStep={currentStep} />
                     </div>
                     <div className="flex justify-center mt-10 mb-5">
-                    <div className="w-4/5 py-12 shadow-lg bg-gray-100 rounded-3xl border-2 border-gray-300">
-                        <StepperContext.Provider value={{ tempData, setTempData }}>
-                            {displayFragments(currentStep)}
-                        </StepperContext.Provider>
-                    </div>
+                        <div className="w-4/5 py-12 shadow-lg bg-gray-100 rounded-3xl border-2 border-gray-300">
+                            <StepperContext.Provider value={{ tempData, setTempData }}>
+                                {displayFragments(currentStep)}
+                            </StepperContext.Provider>
+                        </div>
                     </div>
                     <div className="flex justify-center">
                         {currentStep !== steps.length && <StepperControl callBack={handleClick} currentStep={currentStep} />}

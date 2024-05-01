@@ -1,16 +1,16 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Homepage from "./Homepage";
 import { getCookie, setCookie } from "../utils/cookieUtil";
 import { decodeJwt } from "../utils/decodeJwt";
 import authService from "../services/authService";
 import Swal from "sweetalert2";
-import useLoginState from "../hooks/useLoginState";
+import { LoginContext } from "../contexts/loginContext";
 
 export default function Login() {
 
     const navigate = useNavigate();
-    const { isLoggedIn, login, logout } = useLoginState();
+    const { isLoggedIn, setIsLoggedIn } = useContext(LoginContext);
     const [role, setRole] = useState<string>();
 
 
@@ -19,9 +19,9 @@ export default function Login() {
         if (token) {
             const role = decodeJwt(token).RoleType;
             setRole(role);
-            login();
+            setIsLoggedIn(true);
         }
-    }, []);
+    }, [setIsLoggedIn]);
 
 
     function loginUser(email: string, password: string) {
@@ -38,7 +38,7 @@ export default function Login() {
             setCookie('token', data);
             setRole(role);
             Swal.close();
-            login();
+            setIsLoggedIn(true);
         }).catch((error: Error) => {
             Swal.fire({
                 icon: "error",
@@ -86,6 +86,6 @@ export default function Login() {
             </>
         )
     } else {
-        return (<Homepage role={role} logout={logout} />)
+        return (<Homepage role={role} />)
     }
 }

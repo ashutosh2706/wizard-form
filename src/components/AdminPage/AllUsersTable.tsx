@@ -1,4 +1,4 @@
-import { createColumnHelper, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, useReactTable } from "@tanstack/react-table";
+import { createColumnHelper, flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table";
 import { UserModel } from "../../types/userModel";
 import TableSearch from "../TableSearch"
 import { useEffect, useState } from "react";
@@ -7,9 +7,8 @@ import ToggleSwitch from "../ToggleSwitch";
 import { getCookie } from "../../utils/cookieUtil";
 import { decodeJwt } from "../../utils/decodeJwt";
 import { userService } from "../../services/userService";
-import RoleModal from "./RoleModal";
-import Swal from "sweetalert2";
 import { SuccessToast } from "../../lib/Toast";
+import { message, Modal, Select, Tooltip, Skeleton, Empty } from "antd";
 
 
 export default function AllUserTable() {
@@ -34,7 +33,7 @@ export default function AllUserTable() {
         }),
         columnHelper.accessor('isAllowed', {
             cell: info => <ToggleSwitch switchState={info.getValue() === 'allowed' ? true : false} />,
-            header: "ALLOWED",
+            header: "ACCOUNT",
         }),
         columnHelper.accessor('roleId', {
             cell: info => {
@@ -42,19 +41,23 @@ export default function AllUserTable() {
                     return (
                         <div className="flex items-center justify-start gap-2">
                             <span>User</span>
-                            <Settings className="w-5 h-5 cursor-pointer" />
+                            <Tooltip title="Change role">
+                                <Settings className="w-5 h-5 cursor-pointer" />
+                            </Tooltip>
                         </div>
                     )
                 } else {
                     return (
                         <div className="flex items-center justify-start gap-2">
                             <span>Admin</span>
-                            <Settings className="w-5 h-5 cursor-pointer" />
+                            <Tooltip title="Change role">
+                                <Settings className="w-5 h-5 cursor-pointer" />
+                            </Tooltip>
                         </div>
                     )
                 }
             },
-            header: "Role"
+            header: "ROLE"
         })
     ]
 
@@ -64,57 +67,64 @@ export default function AllUserTable() {
     const [renderComponent, setRenderComponent] = useState<boolean>(false);
     const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
     const [userId, setUserId] = useState<number>(-1);
-    const [roleId, setRoleId] = useState<number>(-1);
+    const [roleId, setRoleId] = useState<number>(-1);       // current roleId of user
+    const [newRoleId, setNewRoleId] = useState<number>(-1); // new (assigned) roleId of user
+    const [messageApi, contextHolder] = message.useMessage();
+    const [isLoading, setIsLoading] = useState(true);
+    const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 5 });
+    const [totalPage, setTotalPage] = useState(0);
 
 
     const fetchData = () => {
 
         const token = getCookie('token') ?? '';
         const loggedInUserId = decodeJwt(token).UserId;
+        const pageNumber: number = table.getState().pagination.pageIndex + 1;
+        const pageSize: number = table.getState().pagination.pageSize;
 
-        userService.getUsers().then((data: UserModel[]) => {
-            const filteredData = data.filter(e => e.userId != parseInt(loggedInUserId, 10));    // remove the user which is currently logged in
+
+
+        userService.getUsers(globalFilter.trim(), pageNumber, pageSize).then((data) => {
+
+            setTotalPage(data.total);
+            const users: UserModel[] = data.users;
+            const filteredData = users.filter(e => e.userId != Number(loggedInUserId));    // remove the user which is currently logged in
             setUserData(filteredData);
+            setIsLoading(false);
+            
         }).catch((error: Error) => {
-            Swal.fire({
-                icon: "error",
-                title: "Error",
-                text: `${error.message}`,
-                confirmButtonColor: '#4369ff'
+            messageApi.open({
+                type: 'error',
+                content: `${error.message}`,
             });
+            setIsLoading(false);
         });
     }
 
-    useEffect(() => fetchData(), [renderComponent]);
+    useEffect(() => fetchData(), [renderComponent, pagination, globalFilter]);
 
     const table = useReactTable({
         data: userData,
         columns: defaultColumns,
         state: {
-            globalFilter
+            globalFilter,
+            pagination
         },
-        getFilteredRowModel: getFilteredRowModel(),
-        getCoreRowModel: getCoreRowModel(),
-        getPaginationRowModel: getPaginationRowModel()
+        pageCount: totalPage,
+        onPaginationChange: setPagination,
+        onGlobalFilterChange: setGlobalFilter,
+        manualPagination: true,
+        manualFiltering: true,
+        getCoreRowModel: getCoreRowModel()
     })
 
-    table.getState().pagination.pageSize = 10;
 
-
-    const handleRoleChange = (userId: unknown, roleId: unknown) => {
-        if (typeof userId === 'number' && typeof roleId === 'number') {
-            setUserId(userId);
-            setRoleId(roleId);
-            setIsModalVisible(true);    // open modal
-        }
+    const handleDropdownChange = (newRole: string) => {
+        newRole === 'admin' ? setNewRoleId(2) : newRole === 'user' ? setNewRoleId(1) : setNewRoleId(-1);
     }
 
 
-    const handleUserStatus = (userId: unknown, status: unknown) => {
-
-        /**
-         * => sync the update of status with api
-         */
+    const handleUserStatus = (userId: unknown) => {
 
         if (status === 'allowed') {
             setUserData(prevUserData => {
@@ -136,23 +146,48 @@ export default function AllUserTable() {
             });
         }
 
-        userService.allowUser(userId).then(() => {
+        userService.allowUser(Number(userId)).then(() => {
             SuccessToast.fire({
                 title: "Action completed successfully"
             });
+            setRenderComponent(!renderComponent);
         }).catch((error: Error) => {
-            Swal.fire({
-                icon: "error",
-                title: "Changes not saved",
-                text: `${error.message}`,
-                confirmButtonColor: '#4369ff'
+            messageApi.open({
+                type: 'error',
+                content: `${error.message}`,
             });
+            setRenderComponent(!renderComponent);
         });
+
+
     }
 
 
+    const changeRole = () => {
+        if (newRoleId !== -1) {
+            userService.changeRole(userId, newRoleId).then(() => {
+                SuccessToast.fire({
+                    title: "Role changed successfully"
+                });
+                setRenderComponent(!renderComponent);
+                setIsModalVisible(false);
+            }).catch((error: Error) => {
+                messageApi.open({
+                    type: 'error',
+                    content: `${error.message}`,
+                });
+            });
+        } else {
+            messageApi.open({
+                type: 'error',
+                content: "Please select a role",
+            });
+        }
+    }
+
     return (
         <>
+            {contextHolder}
             <div className="p-5 bg-gray-100 h-screen">
                 <div className="flex justify-between mb-5 me-5">
                     <div className="text-base w-auto">
@@ -161,7 +196,7 @@ export default function AllUserTable() {
                 </div>
                 <div className="overflow-auto rounded-lg shadow-xl border border-gray-400">
                     <table className="shadow-lg w-full rounded-xl overflow-hidden">
-                        <caption className="text-start md:text-xl text-base p-5 font-medium">Account Requests</caption>
+                        <caption className="text-start md:text-xl text-base p-5 font-medium">Manage Users</caption>
                         <thead className="bg-white border-b-2 border-gray-200">
                             {
                                 table.getHeaderGroups().map((headerGroup) => (
@@ -178,7 +213,7 @@ export default function AllUserTable() {
                             }
                         </thead>
                         <tbody className="divide-y divide-gray-200">
-                            {
+                            { isLoading ? (<tr><td colSpan={6} className="p-5 text-center md:text-xl text-sm"><Skeleton active paragraph={{rows: 5}}/></td></tr>) :
                                 table.getRowModel().rows.length ? (
                                     table.getRowModel().rows.map((row, index) => (
                                         <tr key={row.id} className={`${index % 2 == 0 ? 'bg-white' : 'bg-gray-100'} hover:bg-slate-200 transition-all duration-100`}>
@@ -188,13 +223,14 @@ export default function AllUserTable() {
                                                         if (cell.column.id === 'isAllowed') {
                                                             const row = cell.row;
                                                             const userId = row.getAllCells().find(c => c.column.id === 'userId')?.getValue();
-                                                            const status = row.getAllCells().find(c => c.column.id === 'isAllowed')?.getValue();
-                                                            handleUserStatus(userId, status);
+                                                            handleUserStatus(userId);
                                                         } else if (cell.column.id === 'roleId') {
                                                             const row = cell.row;
                                                             const userId = row.getAllCells().find(c => c.column.id === 'userId')?.getValue();
                                                             const roleId = row.getAllCells().find(c => c.column.id === 'roleId')?.getValue();
-                                                            handleRoleChange(userId, roleId);
+                                                            setUserId(Number(userId));
+                                                            setRoleId(Number(roleId));
+                                                            setIsModalVisible(true);
                                                         }
                                                     }}>
                                                         {flexRender(cell.column.columnDef.cell, cell.getContext())}
@@ -203,7 +239,7 @@ export default function AllUserTable() {
                                             }
                                         </tr>
                                     ))
-                                ) : (<tr><td className="text-red-600 font-medium p-5 items-center justify-center md:text-xl text-sm">No record found!</td></tr>)
+                                ) : (<tr><td colSpan={6} className="p-5 text-center md:text-xl text-sm"><Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={"No record found!"}/></td></tr>)
                             }
                         </tbody>
                     </table>
@@ -211,31 +247,47 @@ export default function AllUserTable() {
                 </div>
                 {/** pagination */}
                 <div className="mt-5 flex items-center justify-end gap-2">
-                    <button onClick={() => { table.previousPage() }} disabled={!table.getCanPreviousPage()} className="text-lg font-bold p-1 border border-gray-500 px-2 disabled:opacity-30 shadow-lg">
+                    <button onClick={() => { table.previousPage() }} disabled={!table.getCanPreviousPage()} className="text-lg font-bold rounded-lg p-1 border border-gray-500 px-2 disabled:opacity-30 disabled:cursor-not-allowed shadow-lg">
                         <ChevronLeft className="w-7 h-7" />
                     </button>
-                    <button onClick={() => { table.nextPage() }} disabled={!table.getCanNextPage()} className="text-lg font-bold p-1 border border-gray-500 px-2 disabled:opacity-30 shadow-lg">
+                    <button onClick={() => { table.nextPage() }} disabled={!table.getCanNextPage()} className="text-lg font-bold rounded-lg p-1 border border-gray-500 px-2 disabled:opacity-30 disabled:cursor-not-allowed shadow-lg">
                         <ChevronRight className="w-7 h-7" />
                     </button>
                     <span className="items-center gap-1 hidden md:flex">
                         <div>Page </div>
-                        <strong>{table.getState().pagination.pageIndex + 1} of {" "}{table.getPageCount()}</strong>
+                        <div>{table.getState().pagination.pageIndex + 1} of {" "}{table.getPageCount()}</div>
                     </span>
-                    <span className="items-center gap-1 hidden md:flex">
-                        | Go to page:
-                        <input type="number" defaultValue={table.getState().pagination.pageIndex + 1}
-                            className="border p-1 rounded bg-transparent w-16"
-                            max={table.getPageCount()}
-                            min={1}
-                            onChange={(e) => {
-                                const page = e.target.value ? Number(e.target.value) - 1 : 0;
-                                table.setPageIndex(page);
-                            }} />
-                    </span>
+                    <Select
+                        defaultValue='5'
+                        style={{ width: 120 }}
+                        onChange={(value) => table.setPageSize(Number(value))}
+                        options={[
+                            { value: '5', label: '5 / page' },
+                            { value: '10', label: '10 / page' },
+                            { value: '20', label: '20 / page' },
+                        ]}
+                    />
                 </div>
-
             </div>
-            <RoleModal isModalVisible={isModalVisible} onClose={() => setIsModalVisible(!isModalVisible)} reRenderComponent={() => setRenderComponent(!renderComponent)} userId={userId} roleId={roleId} />
+            <Modal centered title="Change Role" open={isModalVisible} onOk={changeRole} onCancel={() => setIsModalVisible(!isModalVisible)}>
+                <div className="text-lg p-2 flex flex-wrap items-center">
+                    <span className="text-base mr-1">Current Role:&nbsp;</span>
+                    <div className="break-words ms-1 text-base">{roleId === 1 ? 'User' : 'Admin'}</div>
+                </div>
+                <div className="text-lg p-2">
+                    <span className="text-base">New role:&nbsp;</span>
+                    <Select
+                        defaultValue="none"
+                        style={{ width: 120 }}
+                        onChange={handleDropdownChange}
+                        options={[
+                            { value: 'user', label: 'User' },
+                            { value: 'admin', label: 'Admin' },
+                            { value: 'none', label: 'Select Role' },
+                        ]}
+                    />
+                </div>
+            </Modal>
         </>
     )
 }

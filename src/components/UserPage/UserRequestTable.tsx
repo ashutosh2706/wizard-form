@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { SortingState, createColumnHelper, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, useReactTable } from "@tanstack/react-table";
+import { SortingState, createColumnHelper, flexRender, getCoreRowModel, getSortedRowModel, useReactTable } from "@tanstack/react-table";
 import { UserRequest, UserRequestAPI } from "../../types/userRequest";
 import { useNavigate } from "react-router-dom";
 import { CirclePlus, ChevronLeft, ChevronRight } from 'lucide-react';
@@ -7,7 +7,7 @@ import { getCookie } from "../../utils/cookieUtil";
 import { decodeJwt } from "../../utils/decodeJwt";
 import TableSearch from "../TableSearch";
 import { requestService } from "../../services/requestService";
-import Swal from "sweetalert2";
+import { message, Select, Skeleton, Empty } from 'antd';
 
 
 export default function UserRequestTable() {
@@ -57,32 +57,43 @@ export default function UserRequestTable() {
     ]
 
     const [requestData, setRequestData] = useState<UserRequest[]>([]);
-    const [globalFilter, setGlobalFilter] = useState("");
+    const [isLoading, setIsLoading] = useState(true);
+    const [globalFilter, setGlobalFilter] = useState('');
     const [sorting, setSorting] = useState<SortingState>([]);
+    const [messageApi, contextHolder] = message.useMessage();
+    const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 5 });
+    const [totalPage, setTotalPage] = useState(0);
+
 
     useEffect(() => {
+
         const token = getCookie('token') ?? '';
         const userId = decodeJwt(token).UserId;
-        requestService.getUserRequests(parseInt(userId, 10)).then((data: UserRequestAPI[]) => {
-            const mappedData: UserRequest[] = data.map((item: UserRequestAPI) => ({
+        const pageNumber: number = table.getState().pagination.pageIndex + 1;
+        const pageSize: number = table.getState().pagination.pageSize;
+
+        requestService.getUserRequests(parseInt(userId, 10), globalFilter.trim(), pageNumber, pageSize).then((data) => {
+            setTotalPage(data.total);
+            const mappedData: UserRequest[] = data.requests.map((item: UserRequestAPI) => ({
                 requestId: item.requestId,
                 requestDate: item.requestDate,
                 requestTitle: item.title,
                 requestStatus: item.statusCode === 1 ? 'pending' : item.statusCode === 2 ? 'approved' : 'rejected'
             }));
 
+            setIsLoading(false);
             setRequestData(mappedData);
 
+
         }).catch((error: Error) => {
-            Swal.fire({
-                icon: "error",
-                title: "Oops...",
-                text: `${error.message}`,
-                confirmButtonColor: '#4369ff'
+            messageApi.open({
+                type: 'error',
+                content: `${error.message}`,
             });
+            setIsLoading(false);
         });
 
-    }, []);
+    }, [pagination, globalFilter]);
 
 
     const table = useReactTable({
@@ -90,19 +101,22 @@ export default function UserRequestTable() {
         columns: defaultColumns,
         state: {
             globalFilter,
-            sorting: sorting
+            sorting: sorting,
+            pagination
         },
-        getFilteredRowModel: getFilteredRowModel(),
+        pageCount: totalPage,
+        onPaginationChange: setPagination,
+        onGlobalFilterChange: setGlobalFilter,
+        manualPagination: true,
+        manualFiltering: true,
         getCoreRowModel: getCoreRowModel(),
-        getPaginationRowModel: getPaginationRowModel(),
         getSortedRowModel: getSortedRowModel(),
         onSortingChange: setSorting
     })
 
-    table.getState().pagination.pageSize = 10;          // number of rows per page
-
     return (
         <>
+            {contextHolder}
             <div className="p-5 bg-gray-100 h-screen">
                 <div className="flex justify-between mb-5 me-5">
                     <div className="text-base w-auto">
@@ -145,7 +159,7 @@ export default function UserRequestTable() {
                             }
                         </thead>
                         <tbody className="divide-y divide-gray-200">
-                            {
+                            {isLoading ? (<tr><td colSpan={4} className="p-5 text-center md:text-xl text-sm"><Skeleton active paragraph={{rows: 5}}/></td></tr>) :
                                 table.getRowModel().rows.length ? (
                                     table.getRowModel().rows.map((row, index) => (
                                         <tr key={row.id} className={`${index % 2 == 0 ? 'bg-white' : 'bg-gray-100'} hover:bg-slate-200 transition-all duration-100`}>
@@ -158,37 +172,35 @@ export default function UserRequestTable() {
                                             }
                                         </tr>
                                     ))
-                                ) : (<tr><td className="text-red-600 font-medium p-5 items-center justify-center md:text-xl text-sm">No record found!</td></tr>)
+                                ) : (<tr><td colSpan={4} className="p-5 text-center md:text-xl text-sm"><Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={"No record found!"}/></td></tr>)
                             }
                         </tbody>
                     </table>
 
                 </div>
-                {/** pagination */}
+                {/** pagination controller */}
                 <div className="mt-5 flex items-center justify-end gap-2">
-                    <button onClick={() => { table.previousPage() }} disabled={!table.getCanPreviousPage()} className="text-lg font-bold p-1 border border-gray-500 px-2 disabled:opacity-30 shadow-lg">
+                    <button onClick={() => { table.previousPage() }} disabled={!table.getCanPreviousPage()} className="text-lg font-bold rounded-lg p-1 border border-gray-500 px-2 disabled:opacity-30 disabled:cursor-not-allowed shadow-lg">
                         <ChevronLeft className="w-7 h-7" />
                     </button>
-                    <button onClick={() => { table.nextPage() }} disabled={!table.getCanNextPage()} className="text-lg font-bold p-1 border border-gray-500 px-2 disabled:opacity-30 shadow-lg">
+                    <button onClick={() => { table.nextPage() }} disabled={!table.getCanNextPage()} className="text-lg font-bold rounded-lg p-1 border border-gray-500 px-2 disabled:opacity-30 disabled:cursor-not-allowed shadow-lg">
                         <ChevronRight className="w-7 h-7" />
                     </button>
                     <span className="items-center gap-1 hidden md:flex">
                         <div>Page </div>
-                        <strong>{table.getState().pagination.pageIndex + 1} of {" "}{table.getPageCount()}</strong>
+                        <div>{table.getState().pagination.pageIndex + 1} of {" "}{table.getPageCount()}</div>
                     </span>
-                    <span className="items-center gap-1 hidden md:flex">
-                        | Go to page:
-                        <input type="number" defaultValue={table.getState().pagination.pageIndex + 1}
-                            className="border p-1 rounded bg-transparent w-16"
-                            max={table.getPageCount()}
-                            min={1}
-                            onChange={(e) => {
-                                const page = e.target.value ? Number(e.target.value) - 1 : 0;
-                                table.setPageIndex(page);
-                            }} />
-                    </span>
+                    <Select
+                        defaultValue='5'
+                        style={{ width: 120 }}
+                        onChange={(value) => table.setPageSize(Number(value))}
+                        options={[
+                            { value: '5', label: '5 / page' },
+                            { value: '10', label: '10 / page' },
+                            { value: '20', label: '20 / page' },
+                        ]}
+                    />
                 </div>
-
             </div>
         </>
     )

@@ -125,7 +125,7 @@ export const dummyUsers: UserModel[] = [
     {
         userId: 1010,
         firstName: 'Michael',
-        lastName: 'Townley',
+        lastName: 'De Santa',
         email: 'Michael@gmail.com',
         isAllowed: "allowed",
         roleId: -1
@@ -149,7 +149,7 @@ export const dummyUsers: UserModel[] = [
     {
         userId: 101,
         firstName: 'Michael',
-        lastName: 'Townley',
+        lastName: 'De Santa',
         email: 'Michael@gmail.com',
         isAllowed: "allowed",
         roleId: -1
@@ -173,7 +173,7 @@ export const dummyUsers: UserModel[] = [
     {
         userId: 101,
         firstName: 'Michael',
-        lastName: 'Townley',
+        lastName: 'De Santa',
         email: 'Michael@gmail.com',
         isAllowed: "allowed",
         roleId: -1
@@ -197,7 +197,7 @@ export const dummyUsers: UserModel[] = [
     {
         userId: 101,
         firstName: 'Michael',
-        lastName: 'Townley',
+        lastName: 'De Santa',
         email: 'Michael@gmail.com',
         isAllowed: "allowed",
         roleId: -1
@@ -221,7 +221,7 @@ export const dummyUsers: UserModel[] = [
     {
         userId: 101,
         firstName: 'Michael',
-        lastName: 'Townley',
+        lastName: 'De Santa',
         email: 'Michael@gmail.com',
         isAllowed: "allowed",
         roleId: -1

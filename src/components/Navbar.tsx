@@ -1,19 +1,17 @@
 import { User, LogOut } from "lucide-react";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { deleteCookie, getCookie } from "../utils/cookieUtil";
 import { decodeJwt } from "../utils/decodeJwt";
 import { Menu } from "lucide-react";
 import Swal from "sweetalert2";
+import { LoginContext } from "../contexts/loginContext";
 
 
-interface NavbarProps {
-    logout: () => void
-}
-
-export default function Navbar({ logout }: NavbarProps) {
+export default function Navbar() {
 
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [isMenuExpanded, setMenuExpanded] = useState(false);
+    const { setIsLoggedIn } = useContext(LoginContext);
 
     function handleLogout() {
 
@@ -29,7 +27,7 @@ export default function Navbar({ logout }: NavbarProps) {
             if (result.isConfirmed) {
                 deleteCookie('token');
                 deleteCookie('role');
-                logout();
+                setIsLoggedIn(false);
             }
         });
     }
@@ -72,8 +70,8 @@ export default function Navbar({ logout }: NavbarProps) {
 
 
                     <div className="relative">
-                        <div className="flex items-center">
-                            <div className="h-10 w-10 flex items-center justify-center bg-gray-300 rounded-full mr-2">
+                        <div className="flex items-center h-10">
+                            <div className="h-10 w-10 items-center justify-center bg-gray-300 rounded-full mr-2 hidden sm:flex">
                                 <User className="h-6 w-6 text-gray-600" />
                             </div>
                             <span className="text-white mr-4 font-medium hover:underline cursor-pointer" onClick={() => setIsDropdownOpen(!isDropdownOpen)}>{fullName()}</span>

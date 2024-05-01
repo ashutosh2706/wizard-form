@@ -2,7 +2,7 @@ import { Result, Button } from 'antd';
 import { useNavigate } from 'react-router-dom';
 
 
-export default function Error() {
+export default function Unauthorized() {
 
     const navigate = useNavigate();
 
@@ -10,9 +10,9 @@ export default function Error() {
         <>
             <div className='flex items-center justify-center w-screen h-screen'>
                 <Result
-                    status="404"
-                    title="404"
-                    subTitle="Sorry, the page you requested was not found."
+                    status="403"
+                    title="403"
+                    subTitle="Sorry, you are not authorized to access this page."
                     extra={<Button type="primary" onClick={() => navigate("/")}>Back Home</Button>} />
             </div>
         </>

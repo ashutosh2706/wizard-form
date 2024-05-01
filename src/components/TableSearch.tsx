@@ -2,9 +2,9 @@ import { useEffect, useState } from "react"
 import { Search } from "lucide-react";
 
 interface TableSearchProps {
-    onChange: (value: string) => void,
-    debounce: number,
-    initValue: string
+    onChange: (value: string) => void;
+    debounce: number;
+    initValue: string;
 }
 
 export default function TableSearch({ initValue, debounce, onChange }: TableSearchProps) {

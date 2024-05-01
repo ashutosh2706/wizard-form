@@ -1,21 +1,20 @@
 import { AxiosInstance } from "axios";
 import apiConfig from "../api/apiConfig";
-import { UserModel } from "../types/userModel";
 
 const api: AxiosInstance = apiConfig();
 
 export const userService = {
 
-    getUsers: async(): Promise<UserModel[]> => {
+    getUsers: async(query: string, page: number, limit: number) => {
         try {
-            const response = await api.get('Users');
+            const response = await api.get(`Users?page=${page}&limit=${limit}&query=${query}`);
             return response.data;
         } catch (error) {
             throw new Error("An error occurred while fetching users");
         }
     },
     
-    allowUser: async(userId: unknown): Promise<void> => {
+    allowUser: async(userId: number): Promise<void> => {
         try {
             const response = await api.put('Users/allow/' + userId);
             return response.data;

@@ -5,14 +5,13 @@ import UserPage from "../components/UserPage";
 
 interface HomepageProps {
     role: string | undefined;
-    logout: () => void;
 }
 
-export default function Homepage({ role, logout }: HomepageProps) {
+export default function Homepage({ role }: HomepageProps) {
 
     return (
         <>
-            <Navbar logout={logout} />
+            <Navbar/>
             {role === 'admin' && (<AdminPage />)}
             {role === 'user' && (<UserPage />)}
         </>

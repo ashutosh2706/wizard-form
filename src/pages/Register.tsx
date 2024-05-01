@@ -11,6 +11,14 @@ export default function Register() {
     const [adminRole, setAdminRole] = useState(false);
 
     function registerUser(formData: FormData) {
+
+        Swal.fire({
+            text: "Processing...",
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        })
+
         const firstname = formData.get("firstname") as string;
         const lastname = formData.get("lastname") as string;
         const email = formData.get("email") as string;

@@ -3,6 +3,7 @@ import { useState } from "react";
 import { userService } from "../../services/userService";
 import Swal from "sweetalert2";
 import { SuccessToast } from "../../lib/Toast";
+import { message } from "antd";
 
 
 interface RoleModalProps {
@@ -16,6 +17,8 @@ interface RoleModalProps {
 export default function RoleModal({ isModalVisible, onClose, reRenderComponent, userId, roleId }: RoleModalProps) {
 
     const [newRoleId, setNewRoleId] = useState<number>(-1);
+    const [messageApi, contextHolder] = message.useMessage();
+
 
     const handleDropdownChange: React.ChangeEventHandler<HTMLSelectElement> = (e) => {
         const target = e.target as HTMLSelectElement;
@@ -32,11 +35,9 @@ export default function RoleModal({ isModalVisible, onClose, reRenderComponent, 
                 reRenderComponent();
                 onClose();
             }).catch((error: Error) => {
-                Swal.fire({
-                    icon: "error",
-                    title: "Error",
-                    text: `${error.message}`,
-                    confirmButtonColor: '#4369ff'
+                messageApi.open({
+                    type: 'error',
+                    content: `${error.message}`,
                 });
             });
         } else {
@@ -50,7 +51,8 @@ export default function RoleModal({ isModalVisible, onClose, reRenderComponent, 
 
 
     return isModalVisible && (
-        <>
+        <>  
+            {contextHolder}
             <div className="fixed inset-0 bg-gray-400 bg-opacity-70 backdrop-blur-sm flex justify-center items-center">
                 <div className="w-[600px] flex flex-col">
                     <X className="h-8 w-8 text-white place-self-end cursor-pointer hover:text-red-600" onClick={() => onClose()} />
@@ -63,7 +65,7 @@ export default function RoleModal({ isModalVisible, onClose, reRenderComponent, 
                             </div>
                             <div className="text-lg p-2">
                                 <span className="font-medium">New role:&nbsp;</span>
-                                <select className="p-1 rounded-lg border border-gray-700 ms-5" name="request-priority" onChange={handleDropdownChange}>
+                                <select className="p-1 rounded-lg border border-gray-700 ms-5" onChange={handleDropdownChange}>
                                     <option value="">Select Role</option>
                                     <option value="user">USER</option>
                                     <option value="admin">ADMIN</option>

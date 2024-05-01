@@ -6,18 +6,18 @@ const api: AxiosInstance = apiConfig();
 
 export const requestService = {
 
-    getUserRequests: async(userId: number): Promise<UserRequestAPI[]> => {
+    getUserRequests: async(userId: number, query:string, page: number, limit: number) => {
         try {
-            const response = await api.get('Requests/user/' + userId);
+            const response = await api.get(`Requests/user/${userId}?page=${page}&limit=${limit}&query=${query}`);
             return response.data;
         } catch (error) {
             throw new Error("An error occurred while fetching requests");
         }
     },
 
-    getUserRequestsAdmin: async(): Promise<UserRequestAPI[]> => {
+    getUserRequestsAdmin: async(query: string, page: number, limit: number) => {
         try {
-            const response = await api.get('Requests');
+            const response = await api.get(`Requests/?page=${page}&limit=${limit}&query=${query}`);
             return response.data;
         } catch (error) {
             throw new Error("An error occurred while fetching requests");
@@ -45,7 +45,7 @@ export const requestService = {
         try {
             await api.post('Requests', requestData);
         } catch (error) {
-            throw new Error('Bad Request');
+            throw new Error('500: Internal Server Error');
         }
     }
 }
