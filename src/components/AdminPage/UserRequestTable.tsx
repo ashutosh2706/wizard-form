@@ -1,4 +1,4 @@
-import { SortingState, createColumnHelper, flexRender, getCoreRowModel, getSortedRowModel, useReactTable } from "@tanstack/react-table";
+import { SortingState, createColumnHelper, flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table";
 import { UserRequestAdmin } from "../../types/userRequestAdmin";
 import { useEffect, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -26,7 +26,15 @@ export default function UserRequestTable() {
         const pageNumber: number = table.getState().pagination.pageIndex + 1;
         const pageSize: number = table.getState().pagination.pageSize;
 
-        requestService.getAllRequests(globalFilter.trim(), pageNumber, pageSize).then((data) => {
+        let sortField = "", sortDirection = "";
+
+        if(sorting.length > 0) {
+            // when sort is performed
+            const { id, desc } = sorting[0];
+            sortField = id, sortDirection = desc ? 'descending' : 'ascending';
+        }
+
+        requestService.getAllRequests(globalFilter.trim(), pageNumber, pageSize, sortField, sortDirection).then((data) => {
 
             setTotalPage(data.totalPage);
             
@@ -50,7 +58,7 @@ export default function UserRequestTable() {
         });
     }
 
-    useEffect(() => fetchData(), [renderComponent, pagination, globalFilter]);
+    useEffect(() => fetchData(), [renderComponent, pagination, globalFilter, sorting]);
 
 
     const handleRequest = (requestId: number | unknown) => {
@@ -137,17 +145,18 @@ export default function UserRequestTable() {
         enableSorting: true,
         state: {
             globalFilter,
-            sorting: sorting,
+            sorting,
             pagination
         },
+        sortDescFirst: false,
         pageCount: totalPage,
         onPaginationChange: setPagination,
         onGlobalFilterChange: setGlobalFilter,
         manualPagination: true,
         manualFiltering: true,
+        manualSorting: true,
+        onSortingChange: setSorting,
         getCoreRowModel: getCoreRowModel(),
-        getSortedRowModel: getSortedRowModel(),
-        onSortingChange: setSorting
     })
 
 

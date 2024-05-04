@@ -3,12 +3,11 @@ import { UserModel } from "../../types/userModel";
 import TableSearch from "../TableSearch"
 import { useEffect, useState } from "react";
 import { ChevronLeft, ChevronRight, Settings } from "lucide-react";
-import ToggleSwitch from "../ToggleSwitch";
 import { getCookie } from "../../utils/cookieUtil";
 import { decodeJwt } from "../../utils/decodeJwt";
 import { userService } from "../../services/userService";
 import { SuccessToast } from "../../lib/Toast";
-import { message, Modal, Select, Tooltip, Skeleton, Empty } from "antd";
+import { message, Modal, Select, Tooltip, Skeleton, Empty, Switch } from "antd";
 
 
 export default function AllUserTable() {
@@ -32,7 +31,7 @@ export default function AllUserTable() {
             header: "EMAIl"
         }),
         columnHelper.accessor('isAllowed', {
-            cell: info => <ToggleSwitch switchState={info.getValue() === 'allowed' ? true : false} />,
+            cell: info => <Switch defaultChecked={info.getValue() === 'allowed' ? true : false} />,
             header: "ACCOUNT",
         }),
         columnHelper.accessor('roleId', {
@@ -73,7 +72,7 @@ export default function AllUserTable() {
     const [isLoading, setIsLoading] = useState(true);
     const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 5 });
     const [totalPage, setTotalPage] = useState(0);
-
+    
 
     const fetchData = () => {
 
@@ -91,7 +90,7 @@ export default function AllUserTable() {
             const filteredData = users.filter(e => e.userId != Number(loggedInUserId));    // remove the currently logged in user
             setUserData(filteredData);
             setIsLoading(false);
-            
+
         }).catch((error: Error) => {
             messageApi.open({
                 type: 'error',
@@ -126,39 +125,16 @@ export default function AllUserTable() {
 
     const handleUserStatus = (userId: unknown) => {
 
-        if (status === 'allowed') {
-            setUserData(prevUserData => {
-                return prevUserData.map(user => {
-                    if (user.userId === userId) {
-                        return { ...user, isAllowed: 'restricted' };
-                    }
-                    return user;
-                });
-            });
-        } else {
-            setUserData(prevUserData => {
-                return prevUserData.map(user => {
-                    if (user.userId === userId) {
-                        return { ...user, isAllowed: 'allowed' };
-                    }
-                    return user;
-                });
-            });
-        }
-
         userService.allowUser(Number(userId)).then(() => {
             SuccessToast.fire({
                 title: "Action completed successfully"
             });
-            setRenderComponent(!renderComponent);
         }).catch((error: Error) => {
             messageApi.open({
                 type: 'error',
                 content: `${error.message}`,
             });
-            setRenderComponent(!renderComponent);
         });
-
 
     }
 
@@ -213,7 +189,7 @@ export default function AllUserTable() {
                             }
                         </thead>
                         <tbody className="divide-y divide-gray-200">
-                            { isLoading ? (<tr><td colSpan={6} className="p-5 text-center md:text-xl text-sm"><Skeleton active paragraph={{rows: 5}}/></td></tr>) :
+                            {isLoading ? (<tr><td colSpan={6} className="p-5 text-center md:text-xl text-sm"><Skeleton active paragraph={{ rows: 5 }} /></td></tr>) :
                                 table.getRowModel().rows.length ? (
                                     table.getRowModel().rows.map((row, index) => (
                                         <tr key={row.id} className={`${index % 2 == 0 ? 'bg-white' : 'bg-gray-100'} hover:bg-slate-200 transition-all duration-100`}>
@@ -239,7 +215,7 @@ export default function AllUserTable() {
                                             }
                                         </tr>
                                     ))
-                                ) : (<tr><td colSpan={6} className="p-5 text-center md:text-xl text-sm"><Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={"No record found!"}/></td></tr>)
+                                ) : (<tr><td colSpan={6} className="p-5 text-center md:text-xl text-sm"><Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={"No record found!"} /></td></tr>)
                             }
                         </tbody>
                     </table>

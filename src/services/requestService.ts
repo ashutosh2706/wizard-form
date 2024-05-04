@@ -7,9 +7,9 @@ const api: AxiosInstance = apiConfig();
 
 export const requestService = {
 
-    getUserRequests: async(userId: number, searchTerm: string, pageNumber: number, pageSize: number) => {
+    getUserRequests: async(userId: number, searchTerm: string, pageNumber: number, pageSize: number, sortField: string, sortDirection: string) => {
 
-        const queryString = constructQuery(pageNumber, pageSize, searchTerm);
+        const queryString = constructQuery(pageNumber, pageSize, searchTerm, sortField, sortDirection);
 
         try {
             const response = await api.get(`Requests/user/${userId}?${queryString}`);
@@ -19,9 +19,9 @@ export const requestService = {
         }
     },
 
-    getAllRequests: async(searchTerm: string, pageNumber: number, pageSize: number) => {
+    getAllRequests: async(searchTerm: string, pageNumber: number, pageSize: number, sortField: string, sortDirection: string) => {
 
-        const queryString = constructQuery(pageNumber, pageSize, searchTerm);
+        const queryString = constructQuery(pageNumber, pageSize, searchTerm, sortField, sortDirection);
 
         try {
             const response = await api.get(`Requests/?${queryString}`);
@@ -33,7 +33,7 @@ export const requestService = {
 
     updateRequestStatus: async(requestId: number, statusCode: number) => {
         try {
-            await api.put('Requests/update/' + requestId + '/' + statusCode);
+            await api.put(`Requests/update/${requestId}/${statusCode}`);
         } catch (error) {
             throw new Error("An error occurred while updating request status");
         }
@@ -41,7 +41,7 @@ export const requestService = {
 
     getRequestByRequestId: async(requestId: number): Promise<UserRequestAPI> => {
         try {
-            const response = await api.get('Requests/' + requestId);
+            const response = await api.get(`Requests/${requestId}`);
             return response.data;
         } catch (error) {
             throw new Error("An error occurred while fetching request details");

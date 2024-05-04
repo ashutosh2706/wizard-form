@@ -6,9 +6,9 @@ const api: AxiosInstance = apiConfig();
 
 const authService = {
 
-    login: async(email: string, password: string): Promise<string> => {
+    login: async(loginData: FormData): Promise<string> => {
         try {
-            const response = await api.post('Users/login', {email, password});
+            const response = await api.post('Users/login', loginData);
             return response.data;
         } catch (error) {
             if(error instanceof AxiosError) {
@@ -21,9 +21,9 @@ const authService = {
         }
     },
 
-    register: async (firstName: string, lastName: string, email: string, password: string, roleId: number) => {
+    register: async (userData: FormData) => {
         try {
-            const response = await api.post('Users', {firstName, lastName, email, password, roleId});
+            const response = await api.post('Users/register', userData);
             return response.data;
         } catch (error) {
             throw new Error("An error occurred while registering user.");

@@ -61,16 +61,8 @@ export default function Navbar() {
                         </div>
                     </div>
 
-                    {/* <div className="text-white hidden md:block">
-                        <a href="#" className="mr-5 text-lg">Home</a>
-                        <a href="#" className="mr-5 text-lg">About</a>
-                        <a href="#" className="mr-5 text-lg">Services</a>
-                        <a href="#" className="mr-5 text-lg">Contact</a>
-                    </div> */}
-
-
                     <div className="relative">
-                        <div className="flex items-center h-10">
+                        <div className="flex items-center h-10 min-w-32">
                             <div className="h-10 w-10 items-center justify-center bg-gray-300 rounded-full mr-2 hidden sm:flex">
                                 <User className="h-6 w-6 text-gray-600" />
                             </div>

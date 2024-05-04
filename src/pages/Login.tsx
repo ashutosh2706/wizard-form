@@ -24,7 +24,7 @@ export default function Login() {
     }, [setIsLoggedIn]);
 
 
-    function loginUser(email: string, password: string) {
+    function loginUser(formData: FormData) {
 
         Swal.fire({
             text: "Logging you in, please wait",
@@ -33,7 +33,7 @@ export default function Login() {
             }
         });
 
-        authService.login(email, password).then((data) => {
+        authService.login(formData).then((data) => {
             const role = decodeJwt(data).RoleType;
             setCookie('token', data);
             setRole(role);
@@ -63,9 +63,7 @@ export default function Login() {
                             <form action="" className="flex flex-col gap-4" onSubmit={(e: React.FormEvent<HTMLFormElement>) => {
                                 e.preventDefault();
                                 const formData = new FormData(e.currentTarget);
-                                const email = formData.get("email") as string;
-                                const password = formData.get("password") as string;
-                                loginUser(email, password);
+                                loginUser(formData);
                             }}>
                                 <input className="p-2 mt-8 rounded-xl border" type="email" name="email" placeholder="Email" required />
                                 <input className="p-2 rounded-xl border" type="password" name="password" placeholder="Password" required />

@@ -1,10 +1,8 @@
-import { AttachedFile } from "./AttachedFile"
-
 export interface UserRequest {
     requestId: number,
     requestDate: string,
-    requestTitle: string,
-    requestStatus: string
+    title: string,
+    status: string
 }
 
 export interface UserRequestAPI {
@@ -16,5 +14,5 @@ export interface UserRequestAPI {
     userId: number,
     statusCode: number,
     title: string
-    attachedFile: AttachedFile | null
+    attachedFile: null
 }

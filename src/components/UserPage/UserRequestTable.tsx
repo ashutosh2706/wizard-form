@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { SortingState, createColumnHelper, flexRender, getCoreRowModel, getSortedRowModel, useReactTable } from "@tanstack/react-table";
+import { SortingState, createColumnHelper, flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table";
 import { UserRequest, UserRequestAPI } from "../../types/userRequest";
 import { useNavigate } from "react-router-dom";
 import { CirclePlus, ChevronLeft, ChevronRight } from 'lucide-react';
@@ -25,11 +25,11 @@ export default function UserRequestTable() {
             cell: info => info.getValue(),
             header: "DATE"
         }),
-        columnHelper.accessor('requestTitle', {
+        columnHelper.accessor('title', {
             cell: info => info.getValue(),
             header: "TITLE"
         }),
-        columnHelper.accessor('requestStatus', {
+        columnHelper.accessor('status', {
             cell: info => {
                 if (info.getValue() === 'approved') {
                     return (
@@ -72,15 +72,24 @@ export default function UserRequestTable() {
         const pageNumber: number = table.getState().pagination.pageIndex + 1;
         const pageSize: number = table.getState().pagination.pageSize;
 
-        requestService.getUserRequests(parseInt(userId, 10), globalFilter.trim(), pageNumber, pageSize).then((data) => {
+        let sortField = "", sortDirection = "";
+
+        if(sorting.length > 0) {
+            // when sort is performed
+            const { id, desc } = sorting[0];
+            sortField = id, sortDirection = desc ? 'descending' : 'ascending';
+        }
+        
+
+        requestService.getUserRequests(Number(userId), globalFilter.trim(), pageNumber, pageSize, sortField, sortDirection).then((data) => {
 
             setTotalPage(data.totalPage);
             
             const mappedData: UserRequest[] = data.items.map((item: UserRequestAPI) => ({
                 requestId: item.requestId,
                 requestDate: item.requestDate,
-                requestTitle: item.title,
-                requestStatus: item.statusCode === 1 ? 'pending' : item.statusCode === 2 ? 'approved' : 'rejected'
+                title: item.title,
+                status: item.statusCode === 1 ? 'pending' : item.statusCode === 2 ? 'approved' : 'rejected'
             }));
 
             setIsLoading(false);
@@ -95,7 +104,7 @@ export default function UserRequestTable() {
             setIsLoading(false);
         });
 
-    }, [pagination, globalFilter]);
+    }, [pagination, globalFilter, sorting]);
 
 
     const table = useReactTable({
@@ -103,18 +112,20 @@ export default function UserRequestTable() {
         columns: defaultColumns,
         state: {
             globalFilter,
-            sorting: sorting,
+            sorting,
             pagination
         },
         pageCount: totalPage,
-        onPaginationChange: setPagination,
-        onGlobalFilterChange: setGlobalFilter,
+        sortDescFirst: false,
         manualPagination: true,
         manualFiltering: true,
-        getCoreRowModel: getCoreRowModel(),
-        getSortedRowModel: getSortedRowModel(),
-        onSortingChange: setSorting
+        manualSorting: true,
+        onPaginationChange: setPagination,
+        onGlobalFilterChange: setGlobalFilter,
+        onSortingChange: setSorting,
+        getCoreRowModel: getCoreRowModel()
     })
+
 
     return (
         <>

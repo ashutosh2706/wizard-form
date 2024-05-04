@@ -19,13 +19,9 @@ export default function Register() {
             }
         })
 
-        const firstname = formData.get("firstname") as string;
-        const lastname = formData.get("lastname") as string;
-        const email = formData.get("email") as string;
-        const password = formData.get("password") as string;
+        formData.append('roleId', `${adminRole ? '2' : '1'}`);
 
-        const roleId: number = adminRole ? 2 : 1;
-        authService.register(firstname, lastname, email, password, roleId).then(() => {
+        authService.register(formData).then(() => {
             SuccessToast.fire({
                 icon: "success",
                 title: "Registered successfully"
@@ -39,6 +35,8 @@ export default function Register() {
                 confirmButtonColor: '#4369ff'
             });
         });
+
+
     }
 
     return (
@@ -53,8 +51,8 @@ export default function Register() {
                             const formData = new FormData(e.currentTarget);
                             registerUser(formData);
                         }}>
-                            <input className="p-2 mt-8 rounded-xl border" type="text" name="firstname" placeholder="First Name" required />
-                            <input className="p-2 rounded-xl border" type="text" name="lastname" placeholder="Last Name" required />
+                            <input className="p-2 mt-8 rounded-xl border" type="text" name="firstName" placeholder="First Name" required />
+                            <input className="p-2 rounded-xl border" type="text" name="lastName" placeholder="Last Name" required />
                             <input className="p-2 rounded-xl border" type="email" name="email" placeholder="Email" required />
                             <input className="p-2 rounded-xl border" type="password" name="password" placeholder="Password" required />
                             <div className="flex items-center mt-4">
