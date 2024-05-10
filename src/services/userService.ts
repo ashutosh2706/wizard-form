@@ -8,7 +8,7 @@ export const userService = {
 
     getUsers: async(searchTerm: string, pageNumber: number, pageSize: number) => {
 
-        const queryString = constructQuery(pageNumber, pageSize, searchTerm);
+        const queryString = constructQuery(pageNumber, pageSize, searchTerm, "", "");
 
         try {
             const response = await api.get(`Users?${queryString}`);

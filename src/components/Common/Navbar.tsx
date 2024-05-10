@@ -1,10 +1,10 @@
 import { User, LogOut } from "lucide-react";
 import { useContext, useState } from "react";
-import { deleteCookie, getCookie } from "../utils/cookieUtil";
-import { decodeJwt } from "../utils/decodeJwt";
+import { deleteCookie, getCookie } from "../../utils/cookieUtil";
+import { decodeJwt } from "../../utils/decodeJwt";
 import { Menu } from "lucide-react";
 import Swal from "sweetalert2";
-import { LoginContext } from "../contexts/loginContext";
+import { LoginContext } from "../../contexts/loginContext";
 
 
 export default function Navbar() {

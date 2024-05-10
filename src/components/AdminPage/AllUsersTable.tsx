@@ -1,6 +1,6 @@
 import { createColumnHelper, flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table";
 import { UserModel } from "../../types/userModel";
-import TableSearch from "../TableSearch"
+import TableSearch from "../Common/TableSearch"
 import { useEffect, useState } from "react";
 import { ChevronLeft, ChevronRight, Settings } from "lucide-react";
 import { getCookie } from "../../utils/cookieUtil";
@@ -85,6 +85,7 @@ export default function AllUserTable() {
 
         userService.getUsers(globalFilter.trim(), pageNumber, pageSize).then((data) => {
 
+            console.log(data);
             setTotalPage(data.totalPage);
             const users: UserModel[] = data.items;
             const filteredData = users.filter(e => e.userId != Number(loggedInUserId));    // remove the currently logged in user

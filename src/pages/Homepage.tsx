@@ -1,4 +1,4 @@
-import Navbar from "../components/Navbar";
+import Navbar from "../components/Common/Navbar";
 import AdminPage from "../components/AdminPage";
 import UserPage from "../components/UserPage";
 

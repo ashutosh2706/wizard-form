@@ -2,7 +2,7 @@ import { SortingState, createColumnHelper, flexRender, getCoreRowModel, useReact
 import { UserRequestAdmin } from "../../types/userRequestAdmin";
 import { useEffect, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import TableSearch from "../TableSearch"
+import TableSearch from "../Common/TableSearch"
 import { UserRequestAPI } from "../../types/userRequest";
 import { requestService } from "../../services/requestService";
 import { message, Select, Skeleton, Empty } from 'antd';

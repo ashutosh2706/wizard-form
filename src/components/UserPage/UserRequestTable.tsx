@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { CirclePlus, ChevronLeft, ChevronRight } from 'lucide-react';
 import { getCookie } from "../../utils/cookieUtil";
 import { decodeJwt } from "../../utils/decodeJwt";
-import TableSearch from "../TableSearch";
+import TableSearch from "../Common/TableSearch";
 import { requestService } from "../../services/requestService";
 import { message, Select, Skeleton, Empty } from 'antd';
 
